@@ -15,12 +15,24 @@ export const censorPost = tool({
         "If the post contains prohibited content, return true, otherwise return false"
       ),
   }),
-  execute: async ({ postId, title, body, isToBeReported }) => {
+  execute: async ({
+    postId,
+    title,
+    body,
+    isToBeReported,
+  }: {
+    postId: string;
+    title?: string;
+    body?: string;
+    isToBeReported?: boolean;
+  }) => {
     if (!isToBeReported) {
       console.log(`>>>>>> Post ${postId} is not reported`);
       return {
         success: true,
         message: `Post ${postId} is not reported`,
+        postId,
+        censored: false,
       };
     }
 
@@ -60,19 +72,20 @@ export const censorPost = tool({
     await patch.commit();
 
     return {
+      success: true,
+      message: "Content has been censored",
       postId,
       censored: true,
-      message: "Content has been censored",
     };
   },
-});
+} as any);
 
 export const reportUser = tool({
   description: "Report a user for violating community guidelines",
   parameters: z.object({
     userId: z.string().describe("The ID of the user to report"),
   }),
-  execute: async ({ userId }) => {
+  execute: async ({ userId }: { userId: string }) => {
     console.log(`>>>>>> Reporting user ${userId}`);
 
     const patch = adminClient.patch(userId);
@@ -86,4 +99,4 @@ export const reportUser = tool({
       message: `User ${userId} reported successfully`,
     };
   },
-});
+} as any);
