@@ -10,7 +10,7 @@ export const deletePost = async (postId: string) => {
     return { error: "User not found" };
   }
 
-  const post = await getPostById(postId);
+  const post: any = await getPostById(postId);
   if (!post) {
     return { error: "Post not found" };
   }

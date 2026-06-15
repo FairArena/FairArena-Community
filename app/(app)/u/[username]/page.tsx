@@ -4,8 +4,44 @@ import { getUserByUsername } from "@/sanity/lib/user/getUserByUsername";
 import { GetAllPostsQueryResult } from "@/sanity.types";
 import { currentUser } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 type PostData = GetAllPostsQueryResult[number];
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}): Promise<Metadata> {
+  const { username } = await params;
+  const user = await getUserByUsername(username);
+
+  if (!user) {
+    return {
+      title: "User Not Found | FairArena",
+    };
+  }
+
+  const title = `u/${user.username} - FairArena User Profile`;
+  const description = `Check out u/${user.username}'s posts, comments, and community contributions on FairArena.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "profile",
+      username: user.username,
+      url: `/u/${username}`,
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+  };
+}
 
 async function UserPage({
   params,
@@ -18,7 +54,7 @@ async function UserPage({
   if (!user) notFound();
 
   const loggedInUser = await currentUser();
-  const posts = await getPostsForUser(user._id);
+  const posts = (await getPostsForUser(user._id)) as any;
 
   return (
     <>

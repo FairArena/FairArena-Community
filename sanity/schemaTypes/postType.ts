@@ -81,6 +81,23 @@ export const postType = defineType({
       description: "Indicates if this post has been deleted",
       initialValue: false,
     }),
+    defineField({
+      name: "flair",
+      title: "Flair",
+      type: "string",
+      description: "Optional tag/label for the post",
+      options: {
+        list: [
+          { title: "Discussion", value: "Discussion" },
+          { title: "Question", value: "Question" },
+          { title: "News", value: "News" },
+          { title: "Announcement", value: "Announcement" },
+          { title: "Media", value: "Media" },
+          { title: "Meme", value: "Meme" },
+          { title: "Meta", value: "Meta" },
+        ],
+      },
+    }),
   ],
   preview: {
     select: {

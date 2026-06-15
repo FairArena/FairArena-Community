@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FlameIcon, HomeIcon, Minus, Plus, TrendingUpIcon } from "lucide-react";
+import { BookmarkIcon, FlameIcon, HomeIcon, Minus, Plus, TrendingUpIcon } from "lucide-react";
 
 import { SearchForm } from "@/components/search-form";
 import {
@@ -16,8 +16,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
@@ -25,40 +23,13 @@ import ReddishLogo from "@/images/Reddish Full.png";
 import Link from "next/link";
 import { getSubreddits } from "@/sanity/lib/subreddit/getSubreddits";
 import CreateCommunityButton from "./header/CreateCommunityButton";
-
-type SidebarData = {
-  navMain: {
-    title: string;
-    url: string;
-    items: {
-      title: string;
-      url: string;
-      isActive: boolean;
-    }[];
-  }[];
-};
+import { SidebarNavItem } from "./sidebar-nav-item";
+import { SidebarSubNavItem } from "./sidebar-sub-nav-item";
 
 export async function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
-  // TODO: get all subreddits from sanity
   const subreddits = await getSubreddits();
-
-  // This is sample data.
-  const sidebarData: SidebarData = {
-    navMain: [
-      {
-        title: "Communities",
-        url: "#",
-        items:
-          subreddits?.map((subreddit) => ({
-            title: subreddit.title || "unknown",
-            url: `/c/${subreddit.slug}`,
-            isActive: false,
-          })) || [],
-      },
-    ],
-  };
 
   return (
     <Sidebar {...props}>
@@ -88,64 +59,51 @@ export async function AppSidebar({
                 <CreateCommunityButton />
               </SidebarMenuButton>
 
-              <SidebarMenuButton asChild className="p-5">
-                <Link href="/">
-                  <HomeIcon className="w-4 h-4 mr-2" />
-                  Home
-                </Link>
-              </SidebarMenuButton>
+              <SidebarNavItem href="/" icon={<HomeIcon className="w-4 h-4 mr-2" />}>
+                Home
+              </SidebarNavItem>
 
-              <SidebarMenuButton asChild className="p-5">
-                <Link href="/popular">
-                  <TrendingUpIcon className="w-4 h-4 mr-2" />
-                  Popular
-                </Link>
-              </SidebarMenuButton>
-              <SidebarMenuButton asChild className="p-5">
-                <Link href="/hot">
-                  <FlameIcon className="w-4 h-4 mr-2" />
-                  Hot/Controversial
-                </Link>
-              </SidebarMenuButton>
+              <SidebarNavItem href="/popular" icon={<TrendingUpIcon className="w-4 h-4 mr-2" />}>
+                Popular
+              </SidebarNavItem>
+
+              <SidebarNavItem href="/hot" icon={<FlameIcon className="w-4 h-4 mr-2" />}>
+                Hot/Controversial
+              </SidebarNavItem>
+
+              <SidebarNavItem href="/saved" icon={<BookmarkIcon className="w-4 h-4 mr-2" />}>
+                Saved
+              </SidebarNavItem>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
 
         <SidebarGroup>
           <SidebarMenu>
-            {sidebarData.navMain.map((item, index) => (
-              <Collapsible
-                key={item.title}
-                defaultOpen={index === 1}
-                className="group/collapsible"
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                      {item.title}{" "}
-                      <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
-                      <Minus className="ml-auto group-data-[state=closed]/collapsible:hidden" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  {item.items?.length ? (
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        {item.items.map((item) => (
-                          <SidebarMenuSubItem key={item.title}>
-                            <SidebarMenuSubButton
-                              asChild
-                              isActive={item.isActive}
-                            >
-                              <Link href={item.url}>{item.title}</Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  ) : null}
-                </SidebarMenuItem>
-              </Collapsible>
-            ))}
+            <Collapsible defaultOpen className="group/collapsible">
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton>
+                    Communities{" "}
+                    <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
+                    <Minus className="ml-auto group-data-[state=closed]/collapsible:hidden" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                {subreddits && subreddits.length > 0 ? (
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {subreddits.map((subreddit) => (
+                        <SidebarSubNavItem
+                          key={subreddit._id}
+                          href={`/c/${subreddit.slug}`}
+                          title={subreddit.title || "unknown"}
+                        />
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                ) : null}
+              </SidebarMenuItem>
+            </Collapsible>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

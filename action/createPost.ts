@@ -10,6 +10,7 @@ import { createClerkToolkit } from "@clerk/agent-toolkit/ai-sdk";
 import { createOpenAI } from "@ai-sdk/openai";
 import { censorPost, reportUser } from "@/tools/tools";
 import { systemPrompt } from "@/tools/prompt";
+import { parseMarkdownToPortableText } from "@/lib/markdown";
 
 const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -69,6 +70,35 @@ export async function createPost({
     }
     console.log(`Found subreddit: ${subreddit._id}`);
 
+    // Ensure the subreddit is published so it can be referenced
+    let resolvedSubredditId = subreddit._id;
+    if (resolvedSubredditId) {
+      const isDraft = resolvedSubredditId.startsWith("drafts.");
+      const publishedId = isDraft ? resolvedSubredditId.substring("drafts.".length) : resolvedSubredditId;
+      resolvedSubredditId = publishedId;
+
+      try {
+        console.log(`Verifying if published subreddit ${publishedId} exists...`);
+        const publishedSubreddit = await adminClient.getDocument(publishedId);
+        if (!publishedSubreddit) {
+          console.log(`Published subreddit ${publishedId} does not exist. Publishing draft...`);
+          // Fetch the draft document directly
+          const draftSubreddit = await adminClient.getDocument(`drafts.${publishedId}`);
+          if (draftSubreddit) {
+            // Create a published copy
+            const { _id, _createdAt, _updatedAt, ...publishedData } = draftSubreddit;
+            await adminClient.createIfNotExists({
+              ...publishedData,
+              _id: publishedId,
+            });
+            console.log(`Successfully published draft subreddit ${publishedId}`);
+          }
+        }
+      } catch (err) {
+        console.error("Error self-healing/publishing draft subreddit reference:", err);
+      }
+    }
+
     // Prepare image data if provided
     let imageAsset;
     if (imageBase64 && imageFilename && imageContentType) {
@@ -105,28 +135,14 @@ export async function createPost({
     const postDoc: Partial<Post> = {
       _type: "post",
       title,
-      body: body
-        ? [
-            {
-              _type: "block",
-              _key: Date.now().toString(),
-              children: [
-                {
-                  _type: "span",
-                  _key: Date.now().toString() + "1",
-                  text: body,
-                },
-              ],
-            },
-          ]
-        : undefined,
+      body: body ? parseMarkdownToPortableText(body) : undefined,
       author: {
         _type: "reference",
         _ref: user._id,
       },
       subreddit: {
         _type: "reference",
-        _ref: subreddit._id,
+        _ref: resolvedSubredditId,
       },
       publishedAt: new Date().toISOString(),
     };
@@ -165,7 +181,8 @@ export async function createPost({
       const authContext = await auth.protect();
       const toolkit = await createClerkToolkit({ authContext });
       const result = await generateText({
-        model: openrouter("openrouter/free"),
+        model: openrouter("google/gemma-4-31b-it:free"),
+        maxSteps: 3,
         messages: messages as ModelMessage[],
         // Conditionally inject session claims if we have auth context
         system: toolkit.injectSessionClaims(systemPrompt),

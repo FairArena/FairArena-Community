@@ -13,7 +13,8 @@ export async function getPostsForUser(userId: string) {
       "subreddit": subreddit->,
       image,
       isDeleted,
-      isReported
+      isReported,
+      flair
     } | order(publishedAt desc)
   `);
 

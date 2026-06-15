@@ -14,18 +14,44 @@ import CommentList from "../comment/CommentList";
 import PostVoteButtons from "./PostVoteButtons";
 import ReportButton from "../ReportButton";
 import DeleteButton from "../DeleteButton";
+import PostBody from "./PostBody";
+import BookmarkButton from "./BookmarkButton";
+import ShareButton from "./ShareButton";
+import Link from "next/link";
+import { getUserBookmarkStatus } from "@/sanity/lib/bookmark/getUserBookmarkStatus";
 
 interface PostProps {
   post:
     | GetAllPostsQueryResult[number]
     | GetPostsForSubredditQueryResult[number];
   userId: string | null;
+  isDetailPage?: boolean;
 }
 
-async function Post({ post, userId }: PostProps) {
+async function Post({ post, userId, isDetailPage = false }: PostProps) {
   const votes = await getPostVotes(post._id);
   const vote = await getUserPostVoteStatus(post._id, userId);
   const comments = await getPostComments(post._id, userId);
+  const isBookmarked = await getUserBookmarkStatus(post._id, userId);
+
+  const communitySlug =
+    (post.subreddit as any)?.slug?.current ||
+    (post.subreddit as any)?.slug ||
+    "";
+  const postDetailUrl = `/c/${communitySlug}/post/${post._id}`;
+
+  // Flair color mapping
+  const flairColors: Record<string, string> = {
+    Discussion: "bg-blue-100 text-blue-700",
+    Question: "bg-purple-100 text-purple-700",
+    News: "bg-green-100 text-green-700",
+    Announcement: "bg-yellow-100 text-yellow-700",
+    Media: "bg-pink-100 text-pink-700",
+    Meme: "bg-orange-100 text-orange-700",
+    Meta: "bg-gray-100 text-gray-700",
+  };
+
+  const flair = (post as any).flair as string | undefined;
 
   return (
     <article
@@ -43,12 +69,12 @@ async function Post({ post, userId }: PostProps) {
 
         {/* Post Content */}
         <div className="flex-1 p-3">
-          <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+          <div className="flex items-center gap-2 text-xs text-gray-500 mb-2 flex-wrap">
             {post.subreddit && (
               <>
                 <a
-                  href={`/c/${post.subreddit.slug?.current}`}
-                  className="font-medium hover:underline"
+                  href={`/c/${(post.subreddit as any).slug?.current ?? (post.subreddit as any).slug}`}
+                  className="font-medium hover:underline text-gray-700"
                 >
                   c/{post.subreddit.title}
                 </a>
@@ -70,22 +96,42 @@ async function Post({ post, userId }: PostProps) {
             )}
           </div>
 
-          {post.subreddit && (
-            <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-2">
-                {post.title}
+          {/* Title + Flair */}
+          <div className="mb-2">
+            <div className="flex items-start gap-2 flex-wrap">
+              {flair && (
+                <span
+                  className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5 ${
+                    flairColors[flair] || "bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  {flair}
+                </span>
+              )}
+              <h2 className="text-base font-semibold text-gray-900 leading-snug">
+                {isDetailPage ? (
+                  post.title
+                ) : (
+                  <Link
+                    href={postDetailUrl}
+                    className="hover:text-orange-600 transition-colors"
+                  >
+                    {post.title}
+                  </Link>
+                )}
               </h2>
             </div>
-          )}
+          </div>
 
-          {post.body && post.body[0]?.children?.[0]?.text && (
-            <div className="prose prose-sm max-w-none text-gray-700 mb-3">
-              {post.body[0].children[0].text}
+          {/* Post Body - rendered client-side to avoid function-crossing boundary */}
+          {post.body && (
+            <div className="mb-3">
+              <PostBody body={post.body} isDetailPage={isDetailPage} />
             </div>
           )}
 
           {post.image && post.image.asset?._ref && (
-            <div className="relative w-full h-64 mb-3 px-2 bg-gray-100/30 ">
+            <div className="relative w-full h-64 mb-3 px-2 bg-gray-100/30">
               <Image
                 src={urlFor(post.image).url()}
                 alt={post.image.alt || "Post image"}
@@ -95,13 +141,28 @@ async function Post({ post, userId }: PostProps) {
             </div>
           )}
 
-          <button className="flex items-center px-1 py-2 gap-1 text-sm text-gray-500">
-            <MessageSquare className="w-4 h-4" />
-            <span>{comments.length} Comments</span>
-          </button>
+          {/* Action bar */}
+          <div className="flex items-center gap-1 flex-wrap mt-2">
+            <Link
+              href={postDetailUrl}
+              className="flex items-center px-2 py-1.5 gap-1 text-sm text-gray-500 hover:bg-gray-100 rounded transition-colors"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span>{comments.length} Comments</span>
+            </Link>
 
-          <CommentInput postId={post._id} />
-          <CommentList postId={post._id} comments={comments} userId={userId} />
+            <BookmarkButton postId={post._id} initialIsBookmarked={isBookmarked} />
+
+            <ShareButton postId={post._id} communitySlug={communitySlug} />
+          </div>
+
+          {/* Comments shown only on detail page */}
+          {isDetailPage && (
+            <>
+              <CommentInput postId={post._id} />
+              <CommentList postId={post._id} comments={comments} userId={userId} />
+            </>
+          )}
         </div>
       </div>
 

@@ -11,12 +11,15 @@ export async function getPostById(postId: string) {
     "author": author->,
     "subreddit": subreddit->,
     image,
-    isDeleted
+    isDeleted,
+    isReported,
+    flair
   }[0]`);
 
   const post = await sanityFetch({
     query: getPostByIdQuery,
     params: { postId },
   });
-  return post.data;
+  return post.data as any;
 }
+
