@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Reddish Sanity Admin Panel",
-  description: "Reddish Sanity Admin Panel",
+  title: "FairArena Community Sanity Admin Panel",
+  description: "FairArena Community Sanity Admin Panel",
 };
 
 export default function RootLayout({

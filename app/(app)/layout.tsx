@@ -18,10 +18,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Reddish",
-  description: "Reddish",
+  title: "FairArena Community",
+  description:
+    "Join the FairArena Community to connect with members, share ideas, participate in discussions, and collaborate in a transparent, fair, and engaging environment.",
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{

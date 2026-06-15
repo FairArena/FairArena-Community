@@ -1,120 +1,109 @@
-# Reddit AI Clone - Next.js 15 & Sanity CMS
+<p align="center">
+  <img src="https://fra.cloud.appwrite.io/v1/storage/buckets/697b974d001a7a80496e/files/697b9764002453409e98/view?project=69735edc00127d2033d8&mode=admin" alt="FairArena Logo" width="140" height="140">
+</p>
 
-A modern, AI-powered Reddit clone built with Next.js 15, Sanity CMS, Clerk, and AI content moderation. Features real-time content updates, community management, and AI-assisted content filtering.
+---
 
-## Things to do before you start
+<p align="center">
+  <strong>Modern full-stack platform for fair and transparent skill assessment</strong>
+</p>
 
-#### Support the Project
+---
 
-When you sign up for services using our affiliate links, you help support the continued development of project's like these at no extra cost to you:
+# FairArena Community
 
-- Sign up to **Clerk** here: https://go.clerk.com/if5bz07
+<p align="center">
+  <strong>A community-driven platform for creating, sharing, and moderating content with AI-powered assistance</strong>
+</p>
 
-- Sign up to **Sanity:** here: https://www.sanity.io/sonny?utm_source=youtube&utm_medium=video&utm_content=reddit
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#tech-stack">Stack</a> •
+  <a href="#getting-started">Getting Started</a> •
+  <a href="#documentation">Docs</a>
+</p>
 
-These partnerships allow us to maintain this project while keeping it free and open source.
-Thank you for your support!
+---
 
-## Features
+## 🚀 Overview
 
-### For Users
+FairArena is a modern Reddit-inspired community platform built with Next.js 15, Sanity CMS, and Clerk authentication. It features AI-powered content moderation via OpenRouter, real-time content updates, community management, and a responsive UI built with Tailwind CSS and Radix UI components.
 
-- 🏠 Browse posts from all communities on the homepage
-- 🔍 Search for posts and communities
-- 📝 Create and manage posts with rich text formatting
-- 📊 Vote on posts and comments
-- 💬 Participate in community discussions through comments
-- 🖼️ Include images in posts for visual content
-- 👤 User profiles with post history
+---
 
-### For Communities
+## ✨ Features
 
-- 🌐 Create and customize subreddits / communities
-- 📋 Community-specific post feeds
-- 🚫 Report inappropriate content
+- **Community Management**: Create and customize communities (subreddits) with dedicated feeds
+- **AI Content Moderation**: Automatic detection and censoring of inappropriate content using AI
+- **Post Creation**: Rich text posts with image uploads, voting, and commenting
+- **User Profiles**: Personalized profiles with post history
+- **Real-Time Updates**: Live content updates via Sanity's Live Content API
+- **Search**: Search for posts and communities
+- **Authentication**: Secure authentication powered by Clerk
 
-### AI Features
+---
 
-- 🤖 AI-powered content moderation
-- 🛡️ Automatic detection and censoring of inappropriate content
-- 🚩 User reporting system for violations
-- 🔍 Smart content analysis for community standards enforcement
+## 🛠 Tech Stack
 
-### Technical Features
+| Category | Technology | Description |
+|----------|------------|-------------|
+| **Frontend** | Next.js 15 (App Router) | React Framework |
+| **Backend** | Next.js Server Actions | API Layer |
+| **Database** | Sanity CMS | Content Management |
+| **Auth** | Clerk | Authentication |
+| **AI** | OpenRouter (GPT-4.1-mini) | Content Moderation |
+| **Styling** | Tailwind CSS | Styling Framework |
+| **UI** | Radix UI | Accessible Components |
+| **Icons** | Lucide React | Icon Library |
+| **Language** | TypeScript | Programming Language |
 
-- 🚀 Server Components & Server Actions with Next.js 15
-- 👤 Authentication with Clerk
-- 📝 Content management with Sanity.io
-- 🎨 Modern UI with Tailwind CSS and Radix UI
-- 📱 Responsive design
-- 🔄 Real-time content updates
-- 🔒 Protected routes and content
-- ⚡ Turbopack for fast development
+---
 
-### UI/UX Features
-
-- 🎯 Clean, Reddit-inspired interface
-- 🎨 Consistent design system using Radix UI components
-- ♿ Accessible components
-- 📱 Responsive across all devices
-- ⏱️ Time-ago timestamps for posts and comments
-- 🔍 Intuitive search functionality
-- 💫 Micro-interactions for better engagement
-
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
-- npm, yarn, or pnpm
-- Clerk Account
-- Sanity Account
-- OpenRouter API key (for AI moderation)
-
-### Environment Variables
-
-Create a `.env.local` file with:
-
-```bash
-# Sanity
-NEXT_PUBLIC_SANITY_PROJECT_ID=your-project-id
-NEXT_PUBLIC_SANITY_DATASET=production
-SANITY_API_TOKEN=your-sanity-read-token
-
-# Clerk
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-clerk-publishable-key
-CLERK_SECRET_KEY=your-clerk-secret-key
-
-# OpenRouter (for AI moderation)
-OPENROUTER_API_KEY=your-openrouter-api-key
-```
+- **Node.js** (v18+)
+- **pnpm** (v8+)
 
 ### Installation
 
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/fairarena/fairarena-community
+   cd fairarena-community
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
+
+3. **Environment Configuration**
+
+   Create a `.env` file based on the provided example:
+   ```bash
+   cp .env.example .env
+   ```
+
+   Update the created `.env` file with your specific configuration values for Clerk, Sanity, and OpenRouter.
+
+### Running the Application
+
 ```bash
-# Clone the repository
-
-# Install dependencies using pnpm
-pnpm install
-
-# Start the development server with Turbopack
 pnpm dev
-
 ```
+
+The development server will start at `http://localhost:3000` with Turbopack enabled.
 
 ### Setting up Sanity CMS
 
-1. Create a Sanity account
-2. Create a new project
-3. Install the Sanity CLI:
+1. Create a Sanity account and project
+2. Install the Sanity CLI:
    ```bash
    npm install -g @sanity/cli
    ```
-4. Initialize Sanity in your project:
-   ```bash
-   sanity init
-   ```
-5. Deploy Sanity Studio:
+3. Deploy Sanity Studio:
    ```bash
    sanity deploy
    ```
@@ -124,49 +113,68 @@ pnpm dev
 1. Create a Clerk application
 2. Configure authentication providers
 3. Set up redirect URLs
-4. Add environment variables
-
-### Core Technologies
-
-- Next.js 15
-- TypeScript
-- Sanity CMS
-- Clerk Auth
-- OpenAI API
-- Tailwind CSS
-- Radix UI
-- Lucide Icons
-
-## Join the World's Best Developer Course & Community Zero to Full Stack Hero! 🚀
-
-### Want to Master Modern Web Development?
-
-This project was built as part of the [Zero to Full Stack Hero](https://www.papareact.com/course) course. Join thousands of developers and learn how to build projects like this and much more!
-
-#### What You'll Learn:
-
-- 📚 Comprehensive Full Stack Development Training
-- 🎯 50+ Real-World Projects
-- 🤝 Access to the PAPAFAM Developer Community
-- 🎓 Weekly Live Coaching Calls
-- 🤖 AI & Modern Tech Stack Mastery
-- 💼 Career Guidance & Interview Prep
-
-#### Course Features:
-
-- ⭐ Lifetime Access to All Content
-- 🎯 Project-Based Learning
-- 💬 Private Discord Community
-- 🔄 Regular Content Updates
-- 👥 Peer Learning & Networking
-- 📈 Personal Growth Tracking
-
-[Join Zero to Full Stack Hero Today!](https://www.papareact.com/course)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+4. Add the environment variables to your `.env` file
 
 ---
 
-Built with ❤️ using Next.js, Sanity, Clerk, and OpenAI
+## 📁 Project Structure
+
+```text
+.
+├── action/                 # Server Actions
+├── app/
+│   ├── (app)/              # Main application routes
+│   │   ├── community/      # Community pages
+│   │   ├── create-post/    # Post creation
+│   │   ├── popular/        # Popular posts
+│   │   ├── hot/            # Hot posts
+│   │   ├── search/         # Search
+│   │   └── u/              # User profiles
+│   └── (admin)/            # Admin/Studio routes
+├── components/             # React components
+│   ├── comment/            # Comment components
+│   ├── header/             # Header & navigation
+│   └── post/               # Post components
+├── sanity/
+│   ├── lib/                # Sanity queries & client
+│   └── schemaTypes/        # Sanity schema definitions
+└── tools/                  # AI moderation tools
+```
+
+---
+
+## 📚 Documentation
+
+- [Sanity CMS Documentation](https://www.sanity.io/docs)
+- [Clerk Documentation](https://clerk.com/docs)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [OpenRouter Documentation](https://openrouter.ai/docs)
+
+---
+
+## 🤝 Contributing
+
+1. Fork the Project
+2. Create your Feature Branch
+3. Commit your Changes
+4. Push to the Branch
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the **Proprietary License** — see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 👤 Author
+
+**FairArena Team**
+
+- Website: fairarena.app
+- GitHub: github.com/fairarena
+
+<p align="center">
+  <sub>Built with ❤️ by the FairArena Team</sub>
+</p>
