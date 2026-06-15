@@ -1,6 +1,6 @@
 "use client";
 
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
 import { Button } from "../ui/button";
 import ReddishLogo from "@/images/Reddish Full.png";
 import { ChevronLeftIcon, MenuIcon } from "lucide-react";
@@ -10,6 +10,7 @@ import CreatePost from "../post/CreatePost";
 
 function Header() {
   const { toggleSidebar, open, isMobile } = useSidebar();
+  const { isSignedIn } = useUser();
 
   return (
     <header className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -42,15 +43,13 @@ function Header() {
       <div className="flex items-center gap-2">
         <CreatePost />
 
-        <SignedIn>
+        {isSignedIn ? (
           <UserButton />
-        </SignedIn>
-
-        <SignedOut>
+        ) : (
           <Button asChild variant="outline">
             <SignInButton mode="modal" />
           </Button>
-        </SignedOut>
+        )}
       </div>
     </header>
   );

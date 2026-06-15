@@ -11,9 +11,9 @@ function CreatePost() {
   const { user } = useUser();
 
   const handleCreatePost = () => {
-    // Extract the community name from the pathname if it follows the pattern /community/[name]
-    const communityName = pathname.includes("/community/")
-      ? pathname.split("/community/")[1]
+    // Extract the community name from the pathname if it follows the pattern /c/[name]
+    const communityName = pathname.includes("/c/")
+      ? pathname.split("/c/")[1]
       : null;
 
     // If we're in a community, redirect to create post with that community pre-selected

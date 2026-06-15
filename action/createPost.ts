@@ -5,7 +5,7 @@ import { adminClient } from "@/sanity/lib/adminClient";
 import { getSubredditBySlug } from "@/sanity/lib/subreddit/getSubredditBySlug";
 import { getUser } from "@/sanity/lib/user/getUser";
 import { auth } from "@clerk/nextjs/server";
-import { CoreMessage, generateText } from "ai";
+import { ModelMessage, generateText } from "ai";
 import { createClerkToolkit } from "@clerk/agent-toolkit/ai-sdk";
 import { createOpenAI } from "@ai-sdk/openai";
 import { censorPost, reportUser } from "@/tools/tools";
@@ -152,7 +152,7 @@ export async function createPost({
     // TODO: Implement content moderation API call
 
     console.log("Starting content moderation process");
-    const messages: CoreMessage[] = [
+    const messages: ModelMessage[] = [
       {
         role: "user",
         content: `I posted this post -> Post ID: ${post._id}\nTitle: ${title}\nBody: ${body}`,
@@ -166,7 +166,7 @@ export async function createPost({
       const toolkit = await createClerkToolkit({ authContext });
       const result = await generateText({
         model: openrouter("openrouter/free"),
-        messages: messages as CoreMessage[],
+        messages: messages as ModelMessage[],
         // Conditionally inject session claims if we have auth context
         system: toolkit.injectSessionClaims(systemPrompt),
         tools: {

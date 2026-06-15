@@ -71,7 +71,7 @@ function CreatePostForm() {
       if ("error" in result && result.error) {
         setErrorMessage(result.error);
       } else {
-        router.push(`/community/${subreddit}`);
+        router.push(`/c/${subreddit}`);
       }
     } catch (err) {
       console.error("Failed to create post", err);

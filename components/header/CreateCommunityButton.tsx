@@ -130,7 +130,7 @@ function CreateCommunityButton() {
         } else if ("subreddit" in result && result.subreddit) {
           setOpen(false);
           resetForm();
-          router.push(`/community/${result.subreddit.slug?.current}`);
+          router.push(`/c/${result.subreddit.slug?.current}`);
         }
       } catch (err) {
         console.error("Failed to create community", err);
@@ -152,7 +152,7 @@ function CreateCommunityButton() {
         <DialogHeader>
           <DialogTitle>Create a Community</DialogTitle>
           <DialogDescription>
-            Create a community/subreddit to share ideas and get feedback.
+            Create a c/subreddit to share ideas and get feedback.
           </DialogDescription>
 
           <form onSubmit={handleCreateCommunity} className="space-y-4 mt-2">
@@ -195,7 +195,7 @@ function CreateCommunityButton() {
                 title="Lowercase letters, numbers, and hyphens only"
               />
               <p className="text-xs text-gray-500">
-                This will be used in the URL: reddish.com/community/
+                This will be used in the URL: community.fairarena.app/c/
                 {slug || "community-slug"}
               </p>
             </div>

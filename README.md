@@ -124,7 +124,7 @@ The development server will start at `http://localhost:3000` with Turbopack enab
 ├── action/                 # Server Actions
 ├── app/
 │   ├── (app)/              # Main application routes
-│   │   ├── community/      # Community pages
+│   │   ├── c/      # Community pages
 │   │   ├── create-post/    # Post creation
 │   │   ├── popular/        # Popular posts
 │   │   ├── hot/            # Hot posts

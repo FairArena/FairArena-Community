@@ -53,7 +53,7 @@ export async function AppSidebar({
         items:
           subreddits?.map((subreddit) => ({
             title: subreddit.title || "unknown",
-            url: `/community/${subreddit.slug}`,
+            url: `/c/${subreddit.slug}`,
             isActive: false,
           })) || [],
       },

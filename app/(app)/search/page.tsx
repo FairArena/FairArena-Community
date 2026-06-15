@@ -39,7 +39,7 @@ async function SearchPage({
                 className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden"
               >
                 <Link
-                  href={`/community/${subreddit.slug}`}
+                  href={`/c/${subreddit.slug}`}
                   className="flex items-center cursor-pointer gap-4 py-5 px-4 hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
                 >
                   <Avatar className="h-12 w-12 border-2 border-red-200 dark:border-red-800 shadow-sm">

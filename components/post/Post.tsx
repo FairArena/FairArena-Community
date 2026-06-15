@@ -47,7 +47,7 @@ async function Post({ post, userId }: PostProps) {
             {post.subreddit && (
               <>
                 <a
-                  href={`/community/${post.subreddit.slug?.current}`}
+                  href={`/c/${post.subreddit.slug?.current}`}
                   className="font-medium hover:underline"
                 >
                   c/{post.subreddit.title}
