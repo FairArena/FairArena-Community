@@ -108,7 +108,7 @@ async function Post({ post, userId }: PostProps) {
       {/* Buttons */}
       <div className="absolute top-2 right-2">
         <div className="flex items-center gap-2">
-          <ReportButton contentId={post._id} />
+          <ReportButton contentId={post._id} isReported={post.isReported ?? false} />
 
           {post.author?._id && (
             <DeleteButton

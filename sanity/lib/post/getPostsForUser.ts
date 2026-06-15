@@ -2,7 +2,7 @@ import { sanityFetch } from "../live";
 import { defineQuery } from "groq";
 
 export async function getPostsForUser(userId: string) {
-  const query = defineQuery(`
+  const getPostsForUserQuery = defineQuery(`
     *[_type == "post" && author._ref == $userId && isDeleted != true] {
       _id,
       title,
@@ -12,12 +12,13 @@ export async function getPostsForUser(userId: string) {
       "author": author->,
       "subreddit": subreddit->,
       image,
-      isDeleted
+      isDeleted,
+      isReported
     } | order(publishedAt desc)
   `);
 
   const result = await sanityFetch({
-    query,
+    query: getPostsForUserQuery,
     params: { userId },
   });
 

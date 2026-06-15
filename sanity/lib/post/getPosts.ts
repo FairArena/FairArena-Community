@@ -13,7 +13,8 @@ export async function getPosts() {
     ,
     "subreddit": subreddit->,
     image,
-    isDeleted
+    isDeleted,
+    isReported
   } | order(publishedAt desc)`);
 
   const posts = await sanityFetch({ query: getAllPostsQuery });

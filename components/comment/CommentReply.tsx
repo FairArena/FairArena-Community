@@ -33,7 +33,7 @@ function CommentReply({
           {isReplying ? "Cancel" : isSignedIn ? "Reply" : "Sign in to reply"}
         </button>
 
-        <ReportButton contentId={comment._id} />
+        <ReportButton contentId={comment._id} isReported={comment.isReported ?? false} />
 
         {comment.author?._id && (
           <DeleteButton

@@ -7,10 +7,11 @@ import { reportContent } from "@/action/reportContent";
 
 interface ReportButtonProps {
   contentId: string;
+  isReported?: boolean;
 }
 
-function ReportButton({ contentId }: ReportButtonProps) {
-  const [isReported, setIsReported] = useState(false);
+function ReportButton({ contentId, isReported: initialReported }: ReportButtonProps) {
+  const [isReported, setIsReported] = useState(initialReported ?? false);
   const [isLoading, setIsLoading] = useState(false);
   const { isSignedIn } = useUser();
 

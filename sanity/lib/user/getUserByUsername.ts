@@ -2,12 +2,12 @@ import { sanityFetch } from "../live";
 import { defineQuery } from "groq";
 
 export async function getUserByUsername(username: string) {
-  const query = defineQuery(
+  const getUserByUsernameQuery = defineQuery(
     `*[_type == "user" && username == $username][0]`
   );
 
   const result = await sanityFetch({
-    query,
+    query: getUserByUsernameQuery,
     params: { username },
   });
 
