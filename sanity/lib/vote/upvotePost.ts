@@ -1,6 +1,7 @@
 import { defineQuery } from "next-sanity";
 import { adminClient } from "../adminClient";
 import { sanityFetch } from "../live";
+import { dispatchNotification } from "../notification/dispatchNotification";
 
 export async function upvotePost(postId: string, userId: string) {
   // Check if user has already voted on this post
@@ -30,7 +31,7 @@ export async function upvotePost(postId: string, userId: string) {
   }
 
   // Create a new upvote
-  return await adminClient.create({
+  const vote = await adminClient.create({
     _type: "vote",
     post: {
       _type: "reference",
@@ -43,4 +44,22 @@ export async function upvotePost(postId: string, userId: string) {
     voteType: "upvote",
     createdAt: new Date().toISOString(),
   });
+
+  // Dispatch notification
+  try {
+    const post = await adminClient.getDocument(postId) as any;
+    const recipientId = post?.author?._ref || "";
+    if (recipientId && recipientId !== userId) {
+      await dispatchNotification({
+        recipientId,
+        senderId: userId,
+        type: "upvote",
+        postId,
+      });
+    }
+  } catch (err) {
+    console.error("Failed to dispatch upvote notification:", err);
+  }
+
+  return vote;
 }

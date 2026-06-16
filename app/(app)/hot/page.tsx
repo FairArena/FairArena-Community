@@ -19,7 +19,7 @@ export default function HotPage() {
       <section className="my-8">
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex flex-col gap-4">
-            <PostsList />
+            <PostsList sort="hot" />
           </div>
         </div>
       </section>

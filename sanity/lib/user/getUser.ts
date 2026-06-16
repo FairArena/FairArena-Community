@@ -10,9 +10,13 @@ interface UserResult {
   email: string;
 }
 
-const parseUsername = (username: string) => {
+const parseUsername = (username?: string | null) => {
   // Remove whitespace and convert to camelCase with random number to avoid conflicts
   const randomNum = Math.floor(1000 + Math.random() * 9000);
+
+  if (!username) {
+    return "Redditor" + randomNum;
+  }
 
   // Convert whitespace to camelCase and add random number to avoid conflicts
   return (
@@ -62,7 +66,7 @@ export async function getUser(): Promise<UserResult | { error: string }> {
     // If user doesn't exist, create a new user
     const newUser = await addUser({
       id: loggedInUser.id,
-      username: parseUsername(loggedInUser.fullName!),
+      username: parseUsername(loggedInUser.fullName || loggedInUser.username),
       email:
         loggedInUser.primaryEmailAddress?.emailAddress ||
         loggedInUser.emailAddresses[0].emailAddress,

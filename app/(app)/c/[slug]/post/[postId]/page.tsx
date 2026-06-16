@@ -7,7 +7,7 @@ import CommunitySidebar from "@/components/CommunitySidebar";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import PostDetail from "@/components/post/PostDetail";
 import SimilarPosts from "@/components/post/SimilarPosts";
@@ -48,6 +48,12 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   const post = postResult as any;
 
   if (!post || post.isDeleted) return notFound();
+
+  // Self-healing redirect if URL slug does not match post's actual subreddit slug
+  const postSubredditSlug = post.subreddit?.slug?.current || post.subreddit?.slug;
+  if (postSubredditSlug && postSubredditSlug !== slug) {
+    redirect(`/c/${postSubredditSlug}/post/${postId}`);
+  }
 
   const community = await getSubredditBySlug(slug);
   if (!community) return notFound();

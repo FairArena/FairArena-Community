@@ -7,7 +7,9 @@ export async function getPosts(sort: PostSortOrder = "new") {
   const orderClause =
     sort === "top"
       ? "order(count(*[_type == 'vote' && post._ref == ^._id && voteType == 'upvote']) desc)"
-      : "order(publishedAt desc)";
+      : sort === "hot"
+        ? "order((count(*[_type == 'vote' && post._ref == ^._id]) + count(*[_type == 'comment' && post._ref == ^._id])) desc, publishedAt desc)"
+        : "order(publishedAt desc)";
 
   const getAllPostsQuery =
     defineQuery(`*[_type == "post" && isDeleted != true] {

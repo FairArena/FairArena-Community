@@ -19,6 +19,17 @@ export default async function SimilarPosts({ postId, flair, subredditId }: Simil
     return null;
   }
 
+  // Pre-fetch comments count to avoid rendering promises in JSX
+  const postsWithComments = await Promise.all(
+    posts.map(async (p: any) => {
+      const comments = await getPostComments(p._id, null);
+      return {
+        ...p,
+        commentsCount: comments.length,
+      };
+    })
+  );
+
   // Flair color mapping
   const flairColors: Record<string, string> = {
     Discussion: "bg-blue-100 text-blue-700",
@@ -36,8 +47,7 @@ export default async function SimilarPosts({ postId, flair, subredditId }: Simil
         Similar Posts
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {posts.map(async (p: any) => {
-          const comments = await getPostComments(p._id, null);
+        {postsWithComments.map((p: any) => {
           const communitySlug = p.subreddit?.slug?.current || p.subreddit?.slug || "";
           const postDetailUrl = `/c/${communitySlug}/post/${p._id}`;
 
@@ -86,7 +96,7 @@ export default async function SimilarPosts({ postId, flair, subredditId }: Simil
               {/* Comments count */}
               <div className="flex items-center gap-1 text-[11px] text-gray-500 mt-auto pt-2 border-t border-gray-100">
                 <MessageSquare className="w-3.5 h-3.5" />
-                <span>{comments.length} Comments</span>
+                <span>{p.commentsCount} Comments</span>
               </div>
             </div>
           );

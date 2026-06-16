@@ -17,5 +17,9 @@ export async function getUserByUsername(username: string) {
     imageUrl?: string;
     email?: string;
     joinedAt?: string;
+    displayName?: string;
+    bio?: string;
+    bannerColor?: string;
+    following?: { _ref: string }[];
   } | null;
 }

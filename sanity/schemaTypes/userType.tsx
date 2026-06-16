@@ -44,6 +44,32 @@ export const userType = defineType({
       description: "Whether this user has been reported",
       initialValue: false,
     }),
+    defineField({
+      name: "displayName",
+      title: "Display Name",
+      type: "string",
+      description: "Custom user-facing display name",
+    }),
+    defineField({
+      name: "bio",
+      title: "Biography",
+      type: "text",
+      description: "A short biography about the user",
+    }),
+    defineField({
+      name: "bannerColor",
+      title: "Banner Color",
+      type: "string",
+      description: "Profile banner gradient color (e.g. orange, blue, green, purple)",
+      initialValue: "orange",
+    }),
+    defineField({
+      name: "following",
+      title: "Following",
+      type: "array",
+      description: "Users this user is following",
+      of: [{ type: "reference", to: [{ type: "user" }] }],
+    }),
   ],
   preview: {
     select: {

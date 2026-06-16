@@ -1,4 +1,5 @@
 import { adminClient } from "../adminClient";
+import { dispatchNotification } from "../notification/dispatchNotification";
 
 interface AddCommentParams {
   content: string;
@@ -37,6 +38,30 @@ export async function addComment({
 
     // Create the comment in Sanity
     const comment = await adminClient.create(commentData);
+
+    // Dispatch notification
+    try {
+      let recipientId = "";
+      if (parentCommentId) {
+        const parentComment = await adminClient.getDocument(parentCommentId) as any;
+        recipientId = parentComment?.author?._ref || "";
+      } else {
+        const post = await adminClient.getDocument(postId) as any;
+        recipientId = post?.author?._ref || "";
+      }
+
+      if (recipientId && recipientId !== userId) {
+        await dispatchNotification({
+          recipientId,
+          senderId: userId,
+          type: parentCommentId ? "reply" : "comment",
+          postId,
+          commentId: comment._id,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to dispatch comment notification:", err);
+    }
 
     return { comment };
   } catch (error) {
