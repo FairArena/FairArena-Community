@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -7,16 +6,6 @@ import { AppSidebar } from "@/components/app-sidebar";
 import Header from "@/components/header/Header";
 import { SanityLive } from "@/sanity/lib/live";
 import { ThemeProvider } from "@/components/ThemeProvider";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "FairArena Community",
@@ -32,7 +21,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className="antialiased"
         >
           <ThemeProvider>
             <SidebarProvider>

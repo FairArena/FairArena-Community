@@ -26,6 +26,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
 import { createPost } from "@/action/createPost";
+import { toast } from "sonner";
 import { PortableText } from "@portabletext/react";
 import { parseMarkdownToPortableText } from "@/lib/markdown";
 import { uploadImageAsset } from "@/action/uploadImageAsset";
@@ -186,6 +187,7 @@ function CreatePostForm() {
     setErrorMessage("");
     setIsLoading(true);
 
+    const toastId = toast.loading("Creating your post...");
     try {
       let imageBase64: string | null = null;
       let fileName: string | null = null;
@@ -220,16 +222,22 @@ function CreatePostForm() {
         keywords: keywords,
       });
 
-      resetForm();
-
       if ("error" in result && result.error) {
         setErrorMessage(result.error);
+        toast.error(result.error, { id: toastId });
       } else {
-        router.push(`/c/${subreddit}`);
+        toast.success("Post created successfully!", { id: toastId });
+        resetForm();
+        if (result.post?._id) {
+          router.push(`/c/${subreddit}/post/${result.post._id}`);
+        } else {
+          router.push(`/c/${subreddit}`);
+        }
       }
     } catch (err) {
       console.error("Failed to create post", err);
       setErrorMessage("Failed to create post");
+      toast.error("Failed to create post", { id: toastId });
     } finally {
       setIsLoading(false);
     }

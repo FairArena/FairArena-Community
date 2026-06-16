@@ -34,13 +34,25 @@ export function SubredditCombobox({
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(defaultValue);
 
+  // Find the selected subreddit by slug or title
+  const selectedSubreddit = subreddits.find(
+    (sub) =>
+      sub.slug === value ||
+      sub.title?.toLowerCase() === value?.toLowerCase()
+  );
+
   // Handle selection of a subreddit
   const handleSelect = (currentValue: string) => {
-    setValue(currentValue);
+    // Find matching subreddit object by title (since CommandItem value is title)
+    const chosenSubreddit = subreddits.find(
+      (sub) => sub.title?.toLowerCase() === currentValue.toLowerCase()
+    );
+    const slug = chosenSubreddit?.slug || currentValue;
+    setValue(slug);
     setOpen(false);
-    // Update the URL query parameter
-    if (currentValue) {
-      router.push(`/create-post?subreddit=${currentValue}`);
+    
+    if (slug) {
+      router.push(`/create-post?subreddit=${slug}`);
     } else {
       router.push(`/create-post`);
     }
@@ -55,9 +67,8 @@ export function SubredditCombobox({
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {value
-            ? subreddits.find((subreddit) => subreddit.title === value)
-                ?.title || "Select a community"
+          {selectedSubreddit
+            ? selectedSubreddit.title || "Select a community"
             : "Select a community"}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -77,7 +88,7 @@ export function SubredditCombobox({
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === subreddit.title ? "opacity-100" : "opacity-0"
+                      selectedSubreddit?._id === subreddit._id ? "opacity-100" : "opacity-0"
                     )}
                   />
                   {subreddit.title}
