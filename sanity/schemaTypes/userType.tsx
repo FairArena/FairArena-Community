@@ -70,6 +70,13 @@ export const userType = defineType({
       description: "Users this user is following",
       of: [{ type: "reference", to: [{ type: "user" }] }],
     }),
+    defineField({
+      name: "interests",
+      title: "Interests",
+      type: "array",
+      description: "Topics and categories this user is interested in",
+      of: [{ type: "string" }],
+    }),
   ],
   preview: {
     select: {

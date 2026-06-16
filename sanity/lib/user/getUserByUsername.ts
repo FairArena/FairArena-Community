@@ -13,6 +13,7 @@ export async function getUserByUsername(username: string) {
       email,
       joinedAt,
       following[]->,
+      interests,
       _createdAt
     }`
   );
@@ -32,6 +33,7 @@ export async function getUserByUsername(username: string) {
     bio?: string;
     bannerColor?: string;
     following?: any[];
+    interests?: string[];
     _createdAt?: string;
   } | null;
 }

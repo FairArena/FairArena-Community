@@ -6,9 +6,11 @@ import { getSubreddits } from "@/sanity/lib/subreddit/getSubreddits";
 async function CreatePostPage({
   searchParams,
 }: {
-  searchParams: Promise<{ subreddit: string }>;
+  searchParams: Promise<{ subreddit?: string; community?: string }>;
 }) {
-  const { subreddit } = await searchParams;
+  const params = await searchParams;
+  const rawSubreddit = params.subreddit || params.community;
+  const subreddit = rawSubreddit ? rawSubreddit.split("/")[0] : undefined;
 
   // get all subreddits
   const subreddits = await getSubreddits();

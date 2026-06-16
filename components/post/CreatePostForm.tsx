@@ -11,6 +11,13 @@ import {
   List,
   ImagePlus,
   Loader2,
+  Heading1,
+  Heading2,
+  Heading3,
+  ListOrdered,
+  Terminal,
+  Minus,
+  Strikethrough,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "../ui/button";
@@ -45,6 +52,9 @@ const portableTextComponents = {
         {children}
       </code>
     ),
+    strike: ({ children }: any) => (
+      <span className="line-through text-muted-foreground">{children}</span>
+    ),
   },
   block: {
     normal: ({ children }: any) => (
@@ -64,6 +74,12 @@ const portableTextComponents = {
         {children}
       </blockquote>
     ),
+    codeblock: ({ children }: any) => (
+      <pre className="bg-muted p-3 my-2 rounded-md font-mono text-xs overflow-x-auto border border-border text-red-600">
+        <code>{children}</code>
+      </pre>
+    ),
+    hr: () => <hr className="my-4 border-t border-border" />,
   },
   list: {
     bullet: ({ children }: any) => (
@@ -71,9 +87,15 @@ const portableTextComponents = {
         {children}
       </ul>
     ),
+    number: ({ children }: any) => (
+      <ol className="list-decimal pl-5 mb-2 space-y-1 text-foreground">
+        {children}
+      </ol>
+    ),
   },
   listItem: {
     bullet: ({ children }: any) => <li>{children}</li>,
+    number: ({ children }: any) => <li>{children}</li>,
   },
   types: {
     image: ({ value }: any) => {
@@ -110,7 +132,6 @@ const FLAIR_OPTIONS = [
   "Question",
   "News",
   "Announcement",
-  "Media",
   "Meme",
   "Meta",
 ];
@@ -129,6 +150,8 @@ function CreatePostForm() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [activeTab, setActiveTab] = useState<"write" | "preview">("write");
   const [isUploadingInline, setIsUploadingInline] = useState(false);
+  const [keywordsInput, setKeywordsInput] = useState("");
+  const [customFlair, setCustomFlair] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inlineImageInputRef = useRef<HTMLInputElement>(null);
@@ -136,7 +159,8 @@ function CreatePostForm() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const subreddit = searchParams.get("subreddit");
+  const rawSubreddit = searchParams.get("subreddit") || searchParams.get("community");
+  const subreddit = rawSubreddit ? rawSubreddit.split("/")[0] : null;
 
   if (!subreddit) {
     return (
@@ -177,6 +201,10 @@ function CreatePostForm() {
         fileType = imageFile.type;
       }
 
+      const keywords = keywordsInput
+        ? keywordsInput.split(",").map(k => k.trim()).filter(Boolean)
+        : [];
+
       const result = await createPost({
         title: title.trim(),
         subredditSlug: subreddit,
@@ -189,6 +217,7 @@ function CreatePostForm() {
         imageBase64: imageBase64,
         imageFilename: fileName,
         imageContentType: fileType,
+        keywords: keywords,
       });
 
       resetForm();
@@ -216,6 +245,8 @@ function CreatePostForm() {
     setErrorMessage("");
     setImagePreview(null);
     setImageFile(null);
+    setKeywordsInput("");
+    setCustomFlair("");
     setActiveTab("write");
     setPostType("text");
     if (fileInputRef.current) {
@@ -260,12 +291,26 @@ function CreatePostForm() {
       replacement = `*${selectedText || "italic text"}*`;
     } else if (syntax === "code") {
       replacement = `\`${selectedText || "code"}\``;
+    } else if (syntax === "strikethrough") {
+      replacement = `~~${selectedText || "strikethrough text"}~~`;
     } else if (syntax === "link") {
       replacement = `[${selectedText || "link text"}](https://example.com)`;
     } else if (syntax === "quote") {
       replacement = `\n> ${selectedText || "quote text"}\n`;
     } else if (syntax === "list") {
       replacement = `\n- ${selectedText || "list item"}\n`;
+    } else if (syntax === "numlist") {
+      replacement = `\n1. ${selectedText || "list item"}\n`;
+    } else if (syntax === "h1") {
+      replacement = `\n# ${selectedText || "Heading 1"}\n`;
+    } else if (syntax === "h2") {
+      replacement = `\n## ${selectedText || "Heading 2"}\n`;
+    } else if (syntax === "h3") {
+      replacement = `\n### ${selectedText || "Heading 3"}\n`;
+    } else if (syntax === "codeblock") {
+      replacement = `\n\`\`\`\n${selectedText || "code block"}\n\`\`\`\n`;
+    } else if (syntax === "hr") {
+      replacement = `\n---\n`;
     }
 
     const newBody = text.substring(0, start) + replacement + text.substring(end);
@@ -335,31 +380,7 @@ function CreatePostForm() {
           </div>
         )}
 
-        {/* Post Type Tabs */}
-        <div className="flex gap-2 border-b border-border">
-          <button
-            type="button"
-            onClick={() => setPostType("text")}
-            className={`px-4 py-2 font-medium transition-colors ${
-              postType === "text"
-                ? "text-foreground border-b-2 border-orange-500"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Text Post
-          </button>
-          <button
-            type="button"
-            onClick={() => setPostType("link")}
-            className={`px-4 py-2 font-medium transition-colors ${
-              postType === "link"
-                ? "text-foreground border-b-2 border-orange-500"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Link Post
-          </button>
-        </div>
+
 
         {/* Title */}
         <div className="space-y-2">
@@ -433,6 +454,14 @@ function CreatePostForm() {
                   </button>
                   <button
                     type="button"
+                    onClick={() => insertMarkdown("strikethrough")}
+                    className="p-1 hover:bg-muted-foreground/20 rounded transition-colors"
+                    title="Strikethrough"
+                  >
+                    <Strikethrough className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => insertMarkdown("code")}
                     className="p-1 hover:bg-muted-foreground/20 rounded transition-colors"
                     title="Inline Code"
@@ -447,6 +476,32 @@ function CreatePostForm() {
                   >
                     <Link className="w-4 h-4" />
                   </button>
+                  <div className="w-[1px] h-4 bg-border mx-1"></div>
+                  <button
+                    type="button"
+                    onClick={() => insertMarkdown("h1")}
+                    className="p-1 hover:bg-muted-foreground/20 rounded transition-colors"
+                    title="Heading 1"
+                  >
+                    <Heading1 className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertMarkdown("h2")}
+                    className="p-1 hover:bg-muted-foreground/20 rounded transition-colors"
+                    title="Heading 2"
+                  >
+                    <Heading2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertMarkdown("h3")}
+                    className="p-1 hover:bg-muted-foreground/20 rounded transition-colors"
+                    title="Heading 3"
+                  >
+                    <Heading3 className="w-4 h-4" />
+                  </button>
+                  <div className="w-[1px] h-4 bg-border mx-1"></div>
                   <button
                     type="button"
                     onClick={() => insertMarkdown("quote")}
@@ -462,6 +517,30 @@ function CreatePostForm() {
                     title="Bullet List"
                   >
                     <List className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertMarkdown("numlist")}
+                    className="p-1 hover:bg-muted-foreground/20 rounded transition-colors"
+                    title="Numbered List"
+                  >
+                    <ListOrdered className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertMarkdown("codeblock")}
+                    className="p-1 hover:bg-muted-foreground/20 rounded transition-colors"
+                    title="Code Block"
+                  >
+                    <Terminal className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertMarkdown("hr")}
+                    className="p-1 hover:bg-muted-foreground/20 rounded transition-colors"
+                    title="Horizontal Line"
+                  >
+                    <Minus className="w-4 h-4" />
                   </button>
                   <div className="w-[1px] h-4 bg-border mx-1"></div>
                   <button
@@ -520,24 +599,7 @@ function CreatePostForm() {
           </div>
         )}
 
-        {/* Link Post URL */}
-        {postType === "link" && (
-          <div className="space-y-2">
-            <label htmlFor="linkUrl" className="text-sm font-medium">
-              Link URL
-            </label>
-            <Input
-              id="linkUrl"
-              name="linkUrl"
-              type="url"
-              placeholder="https://example.com"
-              className="w-full"
-              value={linkUrl}
-              onChange={(e) => setLinkUrl(e.target.value)}
-              required
-            />
-          </div>
-        )}
+
 
         {/* Flair Selection */}
         <div className="space-y-2">
@@ -557,7 +619,11 @@ function CreatePostForm() {
                 <button
                   key={option}
                   type="button"
-                  onClick={() => setFlair(flair === option ? "" : option)}
+                  onClick={() => {
+                    const nextFlair = flair === option ? "" : option;
+                    setFlair(nextFlair);
+                    setCustomFlair("");
+                  }}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                     flair === option
                       ? flairColors[option] + " shadow-md border border-current/20"
@@ -569,19 +635,20 @@ function CreatePostForm() {
               );
             })}
           </div>
+          <Input
+            placeholder="Or type custom flair..."
+            value={customFlair}
+            onChange={(e) => {
+              const val = e.target.value;
+              setCustomFlair(val);
+              setFlair(val);
+            }}
+            className="w-full max-w-xs mt-2 text-sm"
+          />
         </div>
 
-        {/* NSFW & Spoiler Toggles */}
+        {/* Spoiler Toggle */}
         <div className="flex gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isNSFW}
-              onChange={(e) => setIsNSFW(e.target.checked)}
-              className="w-4 h-4"
-            />
-            <span className="text-sm font-medium">NSFW</span>
-          </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
@@ -591,6 +658,24 @@ function CreatePostForm() {
             />
             <span className="text-sm font-medium">Spoiler</span>
           </label>
+        </div>
+
+        {/* Keywords Input */}
+        <div className="space-y-2">
+          <label htmlFor="keywords" className="text-sm font-medium">
+            Keywords / Tags (comma separated, e.g. gaming, review, meta)
+          </label>
+          <Input
+            id="keywords"
+            name="keywords"
+            placeholder="e.g. gameplay, guide, update"
+            className="w-full"
+            value={keywordsInput}
+            onChange={(e) => setKeywordsInput(e.target.value)}
+          />
+          <p className="text-xs text-muted-foreground">
+            Add keywords to boost search discovery and SEO visibility.
+          </p>
         </div>
 
         {/* Cover Image */}

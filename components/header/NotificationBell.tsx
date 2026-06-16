@@ -97,7 +97,10 @@ export default function NotificationBell() {
             </button>
           )}
         </div>
-        <div className="max-h-72 overflow-y-auto divide-y divide-border">
+        <div 
+          className="max-h-72 overflow-y-auto divide-y divide-border [&::-webkit-scrollbar]:hidden"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
           {notifications.length > 0 ? (
             notifications.map((n) => {
               const communitySlug =

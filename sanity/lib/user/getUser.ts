@@ -8,6 +8,7 @@ interface UserResult {
   username: string;
   imageUrl: string;
   email: string;
+  interests?: string[];
 }
 
 const parseUsername = (username?: string | null) => {
@@ -50,6 +51,7 @@ export async function getUser(): Promise<UserResult | { error: string }> {
         bio,
         bannerColor,
         following[]->,
+        interests,
         _createdAt
       }`
     );
@@ -68,6 +70,7 @@ export async function getUser(): Promise<UserResult | { error: string }> {
         username: existingUser.data.username!,
         imageUrl: existingUser.data.imageUrl!,
         email: existingUser.data.email!,
+        interests: existingUser.data.interests || [],
       };
 
       return user;
@@ -90,6 +93,7 @@ export async function getUser(): Promise<UserResult | { error: string }> {
       username: newUser.username!,
       imageUrl: newUser.imageUrl,
       email: newUser.email,
+      interests: [],
     };
 
     return user;

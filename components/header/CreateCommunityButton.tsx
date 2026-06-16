@@ -148,7 +148,7 @@ function CreateCommunityButton() {
         <Plus className="w-4 h-4 mr-2" />
         {user ? "Create a Community" : "Sign in to create community"}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create a Community</DialogTitle>
           <DialogDescription>

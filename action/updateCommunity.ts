@@ -2,6 +2,7 @@
 
 import { adminClient } from "@/sanity/lib/adminClient";
 import { getUser } from "@/sanity/lib/user/getUser";
+import { revalidatePath } from "next/cache";
 
 export async function updateCommunity({
   subredditId,
@@ -11,6 +12,7 @@ export async function updateCommunity({
   imageFilename,
   imageContentType,
   removeImage,
+  rules,
 }: {
   subredditId: string;
   title: string;
@@ -19,6 +21,7 @@ export async function updateCommunity({
   imageFilename?: string | null;
   imageContentType?: string | null;
   removeImage?: boolean;
+  rules?: Array<{ title: string; description?: string }>;
 }) {
   try {
     const user = await getUser();
@@ -38,6 +41,9 @@ export async function updateCommunity({
 
     const patch = adminClient.patch(subredditId);
     patch.set({ title, description });
+    if (rules !== undefined) {
+      patch.set({ rules: rules || [] });
+    }
 
     if (removeImage) {
       patch.unset(["image"]);
@@ -60,6 +66,8 @@ export async function updateCommunity({
     }
 
     await patch.commit();
+    revalidatePath(`/c/${subreddit.slug}`);
+    revalidatePath("/", "layout");
     return { success: true };
   } catch (error) {
     console.error("Error in updateCommunity server action:", error);

@@ -131,6 +131,13 @@ export const postType = defineType({
       type: "url",
       description: "URL for link posts",
     }),
+    defineField({
+      name: "keywords",
+      title: "Keywords/Tags",
+      type: "array",
+      of: [{ type: "string" }],
+      description: "Tags/keywords for SEO and finding related posts",
+    }),
   ],
   preview: {
     select: {

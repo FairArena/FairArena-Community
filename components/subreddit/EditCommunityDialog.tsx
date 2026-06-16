@@ -24,6 +24,7 @@ interface EditCommunityDialogProps {
     description?: string;
     image?: any;
     slug: string;
+    rules?: Array<{ title: string; description?: string }>;
   };
   currentImageUrl: string | null;
 }
@@ -39,11 +40,32 @@ export default function EditCommunityDialog({
   const [imagePreview, setImagePreview] = useState<string | null>(
     currentImageUrl
   );
+  const [rules, setRules] = useState<Array<{ title: string; description?: string }>>(
+    subreddit.rules || []
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [removeImageFlag, setRemoveImageFlag] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
+  const addRule = () => {
+    setRules((prev) => [...prev, { title: "", description: "" }]);
+  };
+
+  const removeRule = (index: number) => {
+    setRules((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleRuleChange = (
+    index: number,
+    field: "title" | "description",
+    value: string
+  ) => {
+    setRules((prev) =>
+      prev.map((rule, i) => (i === index ? { ...rule, [field]: value } : rule))
+    );
+  };
 
   const removeImage = () => {
     setImagePreview(null);
@@ -99,6 +121,7 @@ export default function EditCommunityDialog({
           imageFilename: fileName,
           imageContentType: fileType,
           removeImage: removeImageFlag,
+          rules: rules.filter((r) => r.title.trim() !== ""),
         });
 
         if (result.error) {
@@ -106,6 +129,7 @@ export default function EditCommunityDialog({
         } else {
           setOpen(false);
           router.refresh();
+          window.location.reload();
         }
       } catch (err) {
         console.error("Failed to update community settings", err);
@@ -122,7 +146,7 @@ export default function EditCommunityDialog({
           Settings
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Community Settings</DialogTitle>
           <DialogDescription>
@@ -203,6 +227,76 @@ export default function EditCommunityDialog({
                 </label>
               </div>
             )}
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-foreground">
+                Community Rules
+              </label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addRule}
+                className="text-xs h-7 py-0 px-2 rounded"
+              >
+                + Add Rule
+              </Button>
+            </div>
+            
+            <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
+              {rules.length > 0 ? (
+                rules.map((rule, index) => (
+                  <div
+                    key={index}
+                    className="p-3 border border-border rounded-lg bg-muted/20 relative space-y-2"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => removeRule(index)}
+                      className="absolute top-2 right-2 text-xs text-red-500 hover:text-red-700 font-semibold"
+                    >
+                      Delete
+                    </button>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block">
+                        Rule Title
+                      </label>
+                      <Input
+                        placeholder="e.g. Keep posts relevant"
+                        value={rule.title}
+                        onChange={(e) =>
+                          handleRuleChange(index, "title", e.target.value)
+                        }
+                        className="h-8 text-xs"
+                        required
+                        maxLength={60}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block">
+                        Rule Description (optional)
+                      </label>
+                      <Textarea
+                        placeholder="Provide details about the rule..."
+                        value={rule.description || ""}
+                        onChange={(e) =>
+                          handleRuleChange(index, "description", e.target.value)
+                        }
+                        className="text-xs"
+                        rows={2}
+                        maxLength={200}
+                      />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-muted-foreground text-center py-2 italic">
+                  No rules defined. Add rules to guide community members.
+                </p>
+              )}
+            </div>
           </div>
 
           <Button

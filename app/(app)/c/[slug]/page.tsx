@@ -96,6 +96,7 @@ async function CommunityPage({
                         title: community.title || "",
                         description: community.description || "",
                         slug: community.slug || "",
+                        rules: community.rules || [],
                       }}
                       currentImageUrl={
                         community.image && community.image.asset?._ref
@@ -168,6 +169,7 @@ async function CommunityPage({
                     slug: community.slug,
                     moderator: community.moderator,
                     _createdAt: (community as any)._createdAt,
+                    rules: community.rules || [],
                   }}
                   isMember={isMember}
                   memberCount={memberCount}

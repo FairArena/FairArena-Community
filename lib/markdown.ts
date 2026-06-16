@@ -9,6 +9,9 @@ export function parseMarkdownToPortableText(text: string) {
 
   let currentListItems: any[] = [];
   let inList = false;
+  let inCodeBlock = false;
+  let codeBlockLines: string[] = [];
+  let codeBlockKey = "";
 
   const flushList = () => {
     if (currentListItems.length > 0) {
@@ -26,8 +29,9 @@ export function parseMarkdownToPortableText(text: string) {
     // 1. Bold: **text**
     // 2. Italic: *text*
     // 3. Inline code: `code`
-    // 4. Link: [text](url)
-    const regex = /(\*\*([^*]+)\*\*|\*([^*]+)\*|`([^`]+)`|\[([^\]]+)\]\(([^)]+)\))/g;
+    // 4. Strikethrough: ~~text~~
+    // 5. Link: [text](url)
+    const regex = /(\*\*([^*]+)\*\*|\*([^*]+)\*|`([^`]+)`|~~([^~]+)~~|\[([^\]]+)\]\(([^)]+)\))/g;
     let match;
     let childIdx = 0;
 
@@ -66,12 +70,19 @@ export function parseMarkdownToPortableText(text: string) {
           text: match[4],
           marks: ["code"],
         });
+      } else if (fullMatch.startsWith("~~")) {
+        children.push({
+          _type: "span",
+          _key: `${blockKey}-${childIdx++}`,
+          text: match[5],
+          marks: ["strike"],
+        });
       } else if (fullMatch.startsWith("[")) {
         const linkKey = `link-${blockKey}-${childIdx}`;
         children.push({
           _type: "span",
           _key: `${blockKey}-${childIdx++}`,
-          text: match[5],
+          text: match[6],
           marks: [linkKey],
         });
       }
@@ -98,7 +109,7 @@ export function parseMarkdownToPortableText(text: string) {
         markDefs.push({
           _key: `link-${blockKey}-${linkIdx}`,
           _type: "link",
-          href: match[6],
+          href: match[7],
         });
         linkIdx++;
       }
@@ -108,7 +119,42 @@ export function parseMarkdownToPortableText(text: string) {
   };
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
+    const rawLine = lines[i];
+    const line = rawLine.trim();
+
+    // Handle code blocks
+    if (line.startsWith("```")) {
+      flushList();
+      if (inCodeBlock) {
+        // End code block
+        blocks.push({
+          _type: "block",
+          _key: codeBlockKey,
+          style: "codeblock",
+          children: [
+            {
+              _type: "span",
+              _key: `${codeBlockKey}-0`,
+              text: codeBlockLines.join("\n"),
+              marks: [],
+            },
+          ],
+          markDefs: [],
+        });
+        codeBlockLines = [];
+        inCodeBlock = false;
+      } else {
+        // Start code block
+        inCodeBlock = true;
+        codeBlockKey = `codeblock-${i}`;
+      }
+      continue;
+    }
+
+    if (inCodeBlock) {
+      codeBlockLines.push(rawLine);
+      continue;
+    }
 
     if (!line) {
       // Empty line closes active lists
@@ -118,8 +164,26 @@ export function parseMarkdownToPortableText(text: string) {
 
     const blockKey = `block-${i}`;
 
-    // 1. Heading 1
-    if (line.startsWith("# ")) {
+    // 1. Horizontal Rule (---, ***, ___)
+    if (line === "---" || line === "***" || line === "___") {
+      flushList();
+      blocks.push({
+        _type: "block",
+        _key: blockKey,
+        style: "hr",
+        children: [
+          {
+            _type: "span",
+            _key: `${blockKey}-0`,
+            text: "",
+            marks: [],
+          },
+        ],
+        markDefs: [],
+      });
+    }
+    // 2. Heading 1
+    else if (line.startsWith("# ")) {
       flushList();
       const content = line.substring(2);
       const { children, markDefs } = parseInlineStyles(content, blockKey);
@@ -131,7 +195,7 @@ export function parseMarkdownToPortableText(text: string) {
         markDefs,
       });
     }
-    // 2. Heading 2
+    // 3. Heading 2
     else if (line.startsWith("## ")) {
       flushList();
       const content = line.substring(3);
@@ -144,7 +208,7 @@ export function parseMarkdownToPortableText(text: string) {
         markDefs,
       });
     }
-    // 3. Heading 3
+    // 4. Heading 3
     else if (line.startsWith("### ")) {
       flushList();
       const content = line.substring(4);
@@ -157,7 +221,7 @@ export function parseMarkdownToPortableText(text: string) {
         markDefs,
       });
     }
-    // 4. Blockquote
+    // 5. Blockquote
     else if (line.startsWith("> ")) {
       flushList();
       const content = line.substring(2);
@@ -170,7 +234,7 @@ export function parseMarkdownToPortableText(text: string) {
         markDefs,
       });
     }
-    // 5. Bullet lists
+    // 6. Bullet lists
     else if (line.startsWith("- ") || line.startsWith("* ")) {
       inList = true;
       const content = line.substring(2);
@@ -185,7 +249,23 @@ export function parseMarkdownToPortableText(text: string) {
         markDefs,
       });
     }
-    // 6. Inline Image block: ![alt](src)
+    // 7. Numbered lists (e.g. 1. )
+    else if (/^\d+\.\s/.test(line)) {
+      inList = true;
+      const match = line.match(/^(\d+)\.\s(.*)/);
+      const content = match ? match[2] : line.substring(3);
+      const { children, markDefs } = parseInlineStyles(content, blockKey);
+      currentListItems.push({
+        _type: "block",
+        _key: blockKey,
+        style: "normal",
+        listItem: "number",
+        level: 1,
+        children,
+        markDefs,
+      });
+    }
+    // 8. Inline Image block: ![alt](src)
     else if (line.startsWith("![") && line.endsWith(")")) {
       flushList();
       const match = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
@@ -213,7 +293,7 @@ export function parseMarkdownToPortableText(text: string) {
         });
       }
     }
-    // 7. Normal paragraph
+    // 9. Normal paragraph
     else {
       flushList();
       const { children, markDefs } = parseInlineStyles(line, blockKey);
@@ -227,14 +307,30 @@ export function parseMarkdownToPortableText(text: string) {
     }
   }
 
+  // Handle unclosed code block
+  if (inCodeBlock) {
+    blocks.push({
+      _type: "block",
+      _key: codeBlockKey,
+      style: "codeblock",
+      children: [
+        {
+          _type: "span",
+          _key: `${codeBlockKey}-0`,
+          text: codeBlockLines.join("\n"),
+          marks: [],
+        },
+      ],
+      markDefs: [],
+    });
+  }
+
   flushList();
   return blocks;
 }
 
 export function portableTextToMarkdown(blocks: any[]): string {
   if (!blocks || !Array.isArray(blocks)) return "";
-
-  let currentListLevel = 0;
 
   return blocks
     .map((block) => {
@@ -245,6 +341,17 @@ export function portableTextToMarkdown(blocks: any[]): string {
       }
 
       if (block._type === "block") {
+        // Horizontal Rule
+        if (block.style === "hr") {
+          return "---";
+        }
+
+        // Code block
+        if (block.style === "codeblock") {
+          const text = block.children?.[0]?.text || "";
+          return `\`\`\`\n${text}\n\`\`\``;
+        }
+
         // Construct the inline text with marks
         let blockText = "";
         const markDefs = block.markDefs || [];
@@ -261,6 +368,8 @@ export function portableTextToMarkdown(blocks: any[]): string {
                   childText = `*${childText}*`;
                 } else if (mark === "code") {
                   childText = `\`${childText}\``;
+                } else if (mark === "strike") {
+                  childText = `~~${childText}~~`;
                 } else {
                   // Check if it's a link mark ref
                   const linkDef = markDefs.find((def: any) => def._key === mark);
@@ -285,6 +394,8 @@ export function portableTextToMarkdown(blocks: any[]): string {
           return `> ${blockText}`;
         } else if (block.listItem === "bullet") {
           return `- ${blockText}`;
+        } else if (block.listItem === "number") {
+          return `1. ${blockText}`;
         } else {
           return blockText;
         }

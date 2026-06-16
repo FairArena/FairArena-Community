@@ -25,6 +25,7 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   return {
     title: `${post.title} | FairArena`,
     description: `View this post in c/${post.subreddit?.title || "community"} on FairArena`,
+    keywords: post.keywords || [],
     openGraph: {
       title: post.title || "",
       description: `View this post in c/${post.subreddit?.title || "community"} on FairArena`,
@@ -97,6 +98,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
                   postId={post._id}
                   flair={post.flair || null}
                   subredditId={post.subreddit?._id}
+                  keywords={post.keywords || null}
                 />
               </Suspense>
             </div>
@@ -114,6 +116,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
                     slug: community.slug,
                     moderator: community.moderator,
                     _createdAt: (community as any)._createdAt,
+                    rules: community.rules || [],
                   }}
                   isMember={isMember}
                   memberCount={memberCount}

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MessageSquare, Pencil } from "lucide-react";
+import { MessageSquare, Pencil, ExternalLink } from "lucide-react";
 import TimeAgo from "../TimeAgo";
 import { urlFor } from "@/sanity/lib/image";
 import PostVoteButtons from "./PostVoteButtons";
@@ -11,6 +11,7 @@ import DeleteButton from "../DeleteButton";
 import PostBody from "./PostBody";
 import BookmarkButton from "./BookmarkButton";
 import ShareButton from "./ShareButton";
+import MediaRevealWrapper from "./MediaRevealWrapper";
 
 interface PostCardPresenterProps {
   post: any;
@@ -51,6 +52,15 @@ export default function PostCardPresenter({
   };
 
   const flair = post.flair as string | undefined;
+
+  let domain = "";
+  if (post.postType === "link" && post.linkUrl) {
+    try {
+      domain = new URL(post.linkUrl).hostname.replace("www.", "");
+    } catch (_) {
+      domain = "link";
+    }
+  }
 
   return (
     <article
@@ -95,51 +105,94 @@ export default function PostCardPresenter({
             )}
           </div>
 
-          {/* Title + Flair */}
+          {/* Title + Flair + Badges */}
           <div className="mb-2">
-            <div className="flex items-start gap-2 flex-wrap">
+            <div className="flex items-start gap-2 flex-wrap mb-1">
               {flair && (
                 <span
-                  className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5 ${
-                    flairColors[flair] || "bg-gray-100 text-gray-700"
+                  className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
+                    flairColors[flair] || "bg-muted text-muted-foreground"
                   }`}
                 >
                   {flair}
                 </span>
               )}
-              <h2 className="text-base font-semibold text-foreground leading-snug">
-                {isDetailPage ? (
-                  post.title
-                ) : (
-                  <Link
-                    href={postDetailUrl}
-                    className="hover:text-orange-600 transition-colors"
-                  >
-                    {post.title}
-                  </Link>
-                )}
-              </h2>
+              {post.isSpoiler && (
+                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-600 dark:bg-slate-700 text-white flex-shrink-0 uppercase tracking-wide">
+                  Spoiler
+                </span>
+              )}
             </div>
+            
+            <h2 className="text-base font-semibold text-foreground leading-snug">
+              {isDetailPage ? (
+                <>
+                  {post.title}
+                  {domain && (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({domain})
+                    </span>
+                  )}
+                </>
+              ) : (
+                <Link
+                  href={postDetailUrl}
+                  className="hover:text-orange-600 transition-colors"
+                >
+                  {post.title}
+                  {domain && (
+                    <span className="text-xs font-normal text-muted-foreground ml-2 hover:no-underline">
+                      ({domain})
+                    </span>
+                  )}
+                </Link>
+              )}
+            </h2>
           </div>
 
-          {/* Post Body */}
-          {post.body && (
-            <div className="mb-3">
-              <PostBody body={post.body} isDetailPage={isDetailPage} />
-            </div>
-          )}
+          {/* Post content wrapped in MediaRevealWrapper if Spoiler */}
+          <MediaRevealWrapper
+            isSpoiler={post.isSpoiler}
+            hasMedia={!!(post.body || post.image || (post.postType === "link" && post.linkUrl))}
+          >
+            {/* Post Body */}
+            {post.body && (
+              <div className="mb-3">
+                <PostBody body={post.body} isDetailPage={isDetailPage} />
+              </div>
+            )}
 
-          {post.image && post.image.asset?._ref && (
-            <div className="relative w-full h-64 mb-3 px-2 bg-muted/30">
-              <Image
-                src={urlFor(post.image).url()}
-                alt={post.image.alt || "Post image"}
-                fill
-                className="object-contain rounded-md p-2"
-                unoptimized
-              />
-            </div>
-          )}
+            {/* Link Preview box */}
+            {post.postType === "link" && post.linkUrl && (
+              <div className="mb-3">
+                <a
+                  href={post.linkUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/40 hover:bg-muted/70 transition-colors"
+                >
+                  <div className="flex-1 min-w-0 pr-3">
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-extrabold block">External Link</span>
+                    <span className="text-sm font-semibold truncate block text-orange-600 dark:text-orange-400">{post.linkUrl}</span>
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                </a>
+              </div>
+            )}
+
+            {/* Image */}
+            {post.image && post.image.asset?._ref && (
+              <div className="relative w-full h-64 mb-3 px-2 bg-muted/30">
+                <Image
+                  src={urlFor(post.image).url()}
+                  alt={post.image.alt || "Post image"}
+                  fill
+                  className="object-contain rounded-md p-2"
+                  unoptimized
+                />
+              </div>
+            )}
+          </MediaRevealWrapper>
 
           {/* Action bar */}
           <div className="flex items-center gap-1 flex-wrap mt-2">

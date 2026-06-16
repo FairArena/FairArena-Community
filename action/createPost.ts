@@ -39,6 +39,7 @@ export async function createPost({
   imageBase64,
   imageFilename,
   imageContentType,
+  keywords,
 }: {
   title: string;
   subredditSlug: string;
@@ -51,6 +52,7 @@ export async function createPost({
   imageBase64?: string | null;
   imageFilename?: string | null;
   imageContentType?: string | null;
+  keywords?: string[];
 }) {
   try {
     console.log("Starting post creation process");
@@ -160,6 +162,7 @@ export async function createPost({
       isSpoiler,
       postType,
       linkUrl: postType === "link" ? linkUrl : undefined,
+      keywords: keywords || undefined,
     };
 
     // Add image if available

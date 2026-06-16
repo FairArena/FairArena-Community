@@ -54,6 +54,9 @@ const portableTextComponents = {
         {children}
       </code>
     ),
+    strike: ({ children }: any) => (
+      <span className="line-through text-muted-foreground">{children}</span>
+    ),
   },
   block: {
     normal: ({ children }: any) => (
@@ -73,6 +76,12 @@ const portableTextComponents = {
         {children}
       </blockquote>
     ),
+    codeblock: ({ children }: any) => (
+      <pre className="bg-muted p-3 my-2 rounded-md font-mono text-xs overflow-x-auto border border-border text-red-600">
+        <code>{children}</code>
+      </pre>
+    ),
+    hr: () => <hr className="my-4 border-t border-border" />,
   },
   list: {
     bullet: ({ children }: any) => (
@@ -91,16 +100,14 @@ const portableTextComponents = {
 interface PostBodyProps {
   body: any;
   isDetailPage?: boolean;
-  isSpoiler?: boolean;
 }
 
 const MAX_HEIGHT = 150;
 
-export default function PostBody({ body, isDetailPage = false, isSpoiler = false }: PostBodyProps) {
+export default function PostBody({ body, isDetailPage = false }: PostBodyProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const [expanded, setExpanded] = useState(isDetailPage);
-  const [spoilerRevealed, setSpoilerRevealed] = useState(false);
 
   useEffect(() => {
     if (isDetailPage) {
@@ -116,18 +123,6 @@ export default function PostBody({ body, isDetailPage = false, isSpoiler = false
       setIsOverflowing(scrollH > MAX_HEIGHT);
     }
   }, [body, isDetailPage]);
-
-  if (isSpoiler && !spoilerRevealed) {
-    return (
-      <button
-        onClick={() => setSpoilerRevealed(true)}
-        className="w-full py-8 px-4 bg-muted hover:bg-muted/80 rounded border border-border transition-colors flex items-center justify-center gap-2 font-semibold text-foreground"
-      >
-        <span>Spoiler</span>
-        <span className="text-sm text-muted-foreground">Click to reveal</span>
-      </button>
-    );
-  }
 
   return (
     <div className="relative">

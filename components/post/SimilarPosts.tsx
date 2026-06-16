@@ -10,10 +10,11 @@ interface SimilarPostsProps {
   postId: string;
   flair: string | null;
   subredditId: string;
+  keywords: string[] | null;
 }
 
-export default async function SimilarPosts({ postId, flair, subredditId }: SimilarPostsProps) {
-  const posts = await getSimilarPosts(postId, flair, subredditId);
+export default async function SimilarPosts({ postId, flair, subredditId, keywords }: SimilarPostsProps) {
+  const posts = await getSimilarPosts(postId, flair, subredditId, keywords);
 
   if (!posts || posts.length === 0) {
     return null;

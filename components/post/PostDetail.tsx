@@ -5,7 +5,7 @@ import { getUserBookmarkStatus } from "@/sanity/lib/bookmark/getUserBookmarkStat
 import TimeAgo from "../TimeAgo";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
-import { MessageSquare, Pencil } from "lucide-react";
+import { MessageSquare, Pencil, ExternalLink } from "lucide-react";
 import CommentInput from "../comment/CommentInput";
 import PostVoteButtons from "./PostVoteButtons";
 import ReportButton from "../ReportButton";
@@ -14,6 +14,7 @@ import PostBody from "./PostBody";
 import BookmarkButton from "./BookmarkButton";
 import ShareButton from "./ShareButton";
 import Link from "next/link";
+import MediaRevealWrapper from "./MediaRevealWrapper";
 import { Suspense } from "react";
 import SortableCommentList from "../comment/SortableCommentList";
 import { getCommentReplies } from "@/sanity/lib/comment/getCommentReplies";
@@ -57,6 +58,10 @@ interface PostDetailProps {
     isReported?: boolean | null;
     isDeleted?: boolean | null;
     flair?: string | null;
+    isNSFW?: boolean;
+    isSpoiler?: boolean;
+    postType?: "text" | "link";
+    linkUrl?: string;
     author?: {
       _id?: string;
       username?: string | null;
@@ -94,6 +99,15 @@ export default async function PostDetail({ post, userId, commentSort = "best" }:
     "";
 
   const isOwner = userId && post.author?._id === userId;
+
+  let domain = "";
+  if (post.postType === "link" && post.linkUrl) {
+    try {
+      domain = new URL(post.linkUrl).hostname.replace("www.", "");
+    } catch (_) {
+      domain = "link";
+    }
+  }
 
   return (
     <article className="bg-card rounded-md shadow-sm border border-border">
@@ -136,42 +150,85 @@ export default async function PostDetail({ post, userId, commentSort = "best" }:
             )}
           </div>
 
-          {/* Title + Flair */}
+          {/* Title + Flair + Badges */}
           <div className="mb-4">
-            <div className="flex items-start gap-2 flex-wrap">
+            <div className="flex items-start gap-2 flex-wrap mb-1">
               {post.flair && (
                 <span
-                  className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 mt-1 ${
+                  className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
                     flairColors[post.flair] || "bg-muted text-muted-foreground"
                   }`}
                 >
                   {post.flair}
                 </span>
               )}
-              <h1 className="text-2xl font-bold text-foreground leading-snug">
-                {post.title}
-              </h1>
+              {post.isSpoiler && (
+                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-600 dark:bg-slate-700 text-white flex-shrink-0 uppercase tracking-wide">
+                  Spoiler
+                </span>
+              )}
             </div>
+            <h1 className="text-2xl font-bold text-foreground leading-snug">
+              {post.title}
+              {domain && (
+                <span className="text-sm font-normal text-muted-foreground ml-2">
+                  ({domain})
+                </span>
+              )}
+            </h1>
+            {post.keywords && post.keywords.length > 0 && (
+              <div className="flex items-center gap-1.5 flex-wrap mt-2">
+                {post.keywords.map((kw: string) => (
+                  <span key={kw} className="text-[11px] bg-muted/60 text-muted-foreground px-2 py-0.5 rounded border border-border">
+                    #{kw}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Post Body (full, no truncation) */}
-          {post.body && (
-            <div className="mb-4 prose prose-sm max-w-none">
-              <PostBody body={post.body} isDetailPage={true} />
-            </div>
-          )}
+          {/* Post content wrapped in MediaRevealWrapper if Spoiler */}
+          <MediaRevealWrapper
+            isSpoiler={post.isSpoiler}
+            hasMedia={!!(post.body || post.image || (post.postType === "link" && post.linkUrl))}
+          >
+            {/* Post Body (full, no truncation) */}
+            {post.body && (
+              <div className="mb-4 prose prose-sm max-w-none">
+                <PostBody body={post.body} isDetailPage={true} />
+              </div>
+            )}
 
-          {/* Image */}
-          {post.image && post.image.asset?._ref && (
-            <div className="relative w-full h-80 mb-4 bg-muted/30">
-              <Image
-                src={urlFor(post.image).url()}
-                alt={post.image.alt || "Post image"}
-                fill
-                className="object-contain rounded-md"
-              />
-            </div>
-          )}
+            {/* Link Preview box */}
+            {post.postType === "link" && post.linkUrl && (
+              <div className="mb-4">
+                <a
+                  href={post.linkUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/40 hover:bg-muted/70 transition-colors"
+                >
+                  <div className="flex-1 min-w-0 pr-3">
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-extrabold block">External Link</span>
+                    <span className="text-sm font-semibold truncate block text-orange-600 dark:text-orange-400">{post.linkUrl}</span>
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                </a>
+              </div>
+            )}
+
+            {/* Image */}
+            {post.image && post.image.asset?._ref && (
+              <div className="relative w-full h-80 mb-4 bg-muted/30">
+                <Image
+                  src={urlFor(post.image).url()}
+                  alt={post.image.alt || "Post image"}
+                  fill
+                  className="object-contain rounded-md"
+                />
+              </div>
+            )}
+          </MediaRevealWrapper>
 
           {/* Action bar */}
           <div className="flex items-center gap-2 py-2 border-b border-border mb-4">

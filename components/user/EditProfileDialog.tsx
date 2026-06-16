@@ -23,6 +23,7 @@ interface EditProfileDialogProps {
     displayName?: string;
     bio?: string;
     bannerColor?: string;
+    interests?: string[];
   };
 }
 
@@ -35,14 +36,38 @@ const BANNERS = [
   { name: "Slate", value: "slate", class: "from-slate-500 to-slate-700" },
 ];
 
+const AVAILABLE_INTERESTS = [
+  "Gaming",
+  "Technology",
+  "Sports",
+  "Movies",
+  "Music",
+  "Cooking",
+  "Science",
+  "News",
+  "Art",
+  "Finance",
+  "Anime",
+  "Travel"
+];
+
 export default function EditProfileDialog({ userProfile }: EditProfileDialogProps) {
   const [errorMessage, setErrorMessage] = useState("");
   const [open, setOpen] = useState(false);
   const [displayName, setDisplayName] = useState(userProfile.displayName || "");
   const [bio, setBio] = useState(userProfile.bio || "");
   const [bannerColor, setBannerColor] = useState(userProfile.bannerColor || "orange");
+  const [interests, setInterests] = useState<string[]>(userProfile.interests || []);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
+  const toggleInterest = (interest: string) => {
+    setInterests((prev) =>
+      prev.includes(interest)
+        ? prev.filter((i) => i !== interest)
+        : [...prev, interest]
+    );
+  };
 
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -54,6 +79,7 @@ export default function EditProfileDialog({ userProfile }: EditProfileDialogProp
           displayName,
           bio,
           bannerColor,
+          interests,
         });
 
         if (result.error) {
@@ -77,7 +103,7 @@ export default function EditProfileDialog({ userProfile }: EditProfileDialogProp
           Edit Profile
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription>
@@ -89,7 +115,7 @@ export default function EditProfileDialog({ userProfile }: EditProfileDialogProp
           <div className="text-red-500 text-sm font-medium">{errorMessage}</div>
         )}
 
-        <form onSubmit={handleUpdate} className="space-y-4">
+        <form onSubmit={handleUpdate} className="space-y-4 pr-4">
           <div className="space-y-1">
             <label htmlFor="display-name" className="text-sm font-semibold text-foreground">
               Display Name
@@ -143,6 +169,31 @@ export default function EditProfileDialog({ userProfile }: EditProfileDialogProp
                   )}
                 </button>
               ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-foreground block">
+              Interests / Favorite Topics
+            </label>
+            <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1 border border-border rounded-md bg-muted/20">
+              {AVAILABLE_INTERESTS.map((interest) => {
+                const isSelected = interests.includes(interest);
+                return (
+                  <button
+                    key={interest}
+                    type="button"
+                    onClick={() => toggleInterest(interest)}
+                    className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-all ${
+                      isSelected
+                        ? "bg-orange-600 border-orange-600 text-white shadow-sm"
+                        : "bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {interest}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

@@ -388,17 +388,8 @@ function EditPostForm({ post }: EditPostFormProps) {
           </div>
         </div>
 
-        {/* NSFW & Spoiler Toggles */}
+        {/* Spoiler Toggle */}
         <div className="flex gap-3">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isNSFW}
-              onChange={(e) => setIsNSFW(e.target.checked)}
-              className="w-4 h-4 rounded cursor-pointer"
-            />
-            <span className="text-sm font-medium text-foreground">NSFW</span>
-          </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"

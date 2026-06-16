@@ -1,7 +1,6 @@
 import * as React from "react";
 import { BookmarkIcon, FlameIcon, HomeIcon, Minus, Plus, TrendingUpIcon } from "lucide-react";
 
-import { SearchForm } from "@/components/search-form";
 import {
   Collapsible,
   CollapsibleContent,
@@ -49,7 +48,6 @@ export async function AppSidebar({
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <SearchForm />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

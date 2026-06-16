@@ -7,10 +7,12 @@ export async function updateProfile({
   displayName,
   bio,
   bannerColor,
+  interests,
 }: {
   displayName?: string;
   bio?: string;
   bannerColor?: string;
+  interests?: string[];
 }) {
   try {
     const user = await getUser();
@@ -30,6 +32,10 @@ export async function updateProfile({
 
     if (bannerColor !== undefined) {
       patch.set({ bannerColor: bannerColor || "orange" });
+    }
+
+    if (interests !== undefined) {
+      patch.set({ interests: interests || [] });
     }
 
     const result = await patch.commit();

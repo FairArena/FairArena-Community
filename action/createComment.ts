@@ -3,6 +3,8 @@
 import { addComment } from "@/sanity/lib/comment/addComment";
 import { getUser } from "@/sanity/lib/user/getUser";
 
+import { revalidatePath } from "next/cache";
+
 export async function createComment(
   postId: string,
   content: string,
@@ -22,6 +24,7 @@ export async function createComment(
       parentCommentId,
     });
 
+    revalidatePath("/", "layout");
     return { comment };
   } catch (error) {
     console.error("Error adding comment:", error);

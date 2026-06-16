@@ -80,6 +80,12 @@ export const subredditType = defineType({
               title: "Rule Description",
               type: "text",
             }),
+            defineField({
+              name: "order",
+              title: "Order",
+              type: "number",
+              hidden: true,
+            }),
           ],
           preview: {
             select: {
@@ -89,6 +95,184 @@ export const subredditType = defineType({
           },
         },
       ],
+    }),
+    defineField({
+      name: "communityType",
+      title: "Community Type",
+      type: "string",
+      description: "Public, Restricted, or Private community",
+      options: {
+        list: [
+          { title: "Public", value: "public" },
+          { title: "Restricted", value: "restricted" },
+          { title: "Private", value: "private" },
+        ],
+      },
+      initialValue: "public",
+    }),
+    defineField({
+      name: "isNSFW",
+      title: "NSFW Community",
+      type: "boolean",
+      description: "Mark community as Not Safe For Work",
+      initialValue: false,
+    }),
+    defineField({
+      name: "icon",
+      title: "Community Icon",
+      type: "image",
+      description: "Community avatar/icon",
+      fields: [
+        {
+          name: "alt",
+          type: "string",
+          title: "Alt Text",
+        },
+      ],
+    }),
+    defineField({
+      name: "banner",
+      title: "Community Banner",
+      type: "image",
+      description: "Community header banner",
+      fields: [
+        {
+          name: "alt",
+          type: "string",
+          title: "Alt Text",
+        },
+      ],
+    }),
+    defineField({
+      name: "primaryColor",
+      title: "Primary Color",
+      type: "string",
+      description: "Hex color for community theming",
+      initialValue: "#FF4500",
+    }),
+    defineField({
+      name: "moderators",
+      title: "Moderators",
+      type: "array",
+      description: "Team of moderators managing this community",
+      of: [
+        {
+          type: "object",
+          fields: [
+            defineField({
+              name: "user",
+              title: "User",
+              type: "reference",
+              to: [{ type: "user" }],
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "role",
+              title: "Role",
+              type: "string",
+              options: {
+                list: [
+                  { title: "Admin", value: "admin" },
+                  { title: "Moderator", value: "moderator" },
+                ],
+              },
+              initialValue: "moderator",
+            }),
+            defineField({
+              name: "addedAt",
+              title: "Added At",
+              type: "datetime",
+              initialValue: () => new Date().toISOString(),
+            }),
+          ],
+          preview: {
+            select: {
+              title: "user.username",
+              subtitle: "role",
+            },
+          },
+        },
+      ],
+    }),
+    defineField({
+      name: "bannedUsers",
+      title: "Banned Users",
+      type: "array",
+      description: "Users banned from this community",
+      of: [
+        {
+          type: "object",
+          fields: [
+            defineField({
+              name: "user",
+              title: "User",
+              type: "reference",
+              to: [{ type: "user" }],
+            }),
+            defineField({
+              name: "reason",
+              title: "Ban Reason",
+              type: "string",
+            }),
+            defineField({
+              name: "bannedAt",
+              title: "Banned At",
+              type: "datetime",
+            }),
+            defineField({
+              name: "expiresAt",
+              title: "Expires At",
+              type: "datetime",
+              description: "Leave empty for permanent ban",
+            }),
+          ],
+        },
+      ],
+    }),
+    defineField({
+      name: "allowedFlairs",
+      title: "Allowed Post Flairs",
+      type: "array",
+      description: "Flairs users can choose from",
+      of: [{ type: "string" }],
+    }),
+    defineField({
+      name: "allowImages",
+      title: "Allow Images",
+      type: "boolean",
+      initialValue: true,
+    }),
+    defineField({
+      name: "allowVideos",
+      title: "Allow Videos",
+      type: "boolean",
+      initialValue: true,
+    }),
+    defineField({
+      name: "allowText",
+      title: "Allow Text Posts",
+      type: "boolean",
+      initialValue: true,
+    }),
+    defineField({
+      name: "allowLinks",
+      title: "Allow Link Posts",
+      type: "boolean",
+      initialValue: true,
+    }),
+    defineField({
+      name: "postApprovalRequired",
+      title: "Post Approval Required",
+      type: "boolean",
+      description: "All posts must be approved by mods",
+      initialValue: false,
+    }),
+    defineField({
+      name: "archiveTime",
+      title: "Archive Time (days)",
+      type: "number",
+      description: "Days until posts are locked",
+      initialValue: 180,
     }),
   ],
   preview: {

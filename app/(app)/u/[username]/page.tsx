@@ -313,9 +313,25 @@ async function UserPage({
                     </h3>
                     <p className="text-xs text-muted-foreground font-medium">u/{user.username}</p>
                     {user.bio && (
-                      <p className="text-xs text-muted-foreground mt-3 bg-gray-50 p-2.5 rounded border border-border italic">
+                      <p className="text-xs text-muted-foreground mt-3 bg-muted/50 p-2.5 rounded border border-border italic">
                         {user.bio}
                       </p>
+                    )}
+
+                    {user.interests && user.interests.length > 0 && (
+                      <div className="mt-4">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">Interests</p>
+                        <div className="flex flex-wrap gap-1">
+                          {user.interests.map((interest: string) => (
+                            <span
+                              key={interest}
+                              className="text-[10px] px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 font-semibold border border-orange-500/20"
+                            >
+                              {interest}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     )}
                   </div>
 

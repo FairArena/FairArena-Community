@@ -17,7 +17,8 @@ export async function getPostById(postId: string) {
     isNSFW,
     isSpoiler,
     postType,
-    linkUrl
+    linkUrl,
+    keywords
   }[0]`);
 
   const post = await sanityFetch({
