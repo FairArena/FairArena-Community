@@ -4,8 +4,33 @@ import { useRef, useEffect, useState } from "react";
 import { PortableText } from "@portabletext/react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
+import Image from "next/image";
+import { urlFor } from "@/sanity/lib/image";
+
 // All portable text components defined CLIENT-SIDE to avoid server→client function boundary error
 const portableTextComponents = {
+  types: {
+    image: ({ value }: any) => {
+      if (!value?.asset?._ref) return null;
+      try {
+        const imageUrl = urlFor(value).url();
+        return (
+          <div className="relative w-full h-80 my-4 bg-gray-100/30">
+            <Image
+              src={imageUrl || "/placeholder.png"}
+              alt={value.alt || "Inline post image"}
+              fill
+              className="object-contain rounded-md"
+              unoptimized
+            />
+          </div>
+        );
+      } catch (err) {
+        console.error("Error rendering inline image:", err);
+        return null;
+      }
+    },
+  },
   marks: {
     link: ({ children, value }: any) => {
       const rel = !value?.href?.startsWith("/") ? "noreferrer noopener" : undefined;

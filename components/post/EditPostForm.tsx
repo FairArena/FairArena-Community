@@ -6,23 +6,25 @@ import {
   Bold,
   Italic,
   Code,
-  Link,
+  Link as LinkIcon,
   Quote,
   List,
   ImagePlus,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "../ui/button";
 import { useState, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
-import { createPost } from "@/action/createPost";
+import { updatePost } from "@/action/updatePost";
 import { PortableText } from "@portabletext/react";
-import { parseMarkdownToPortableText } from "@/lib/markdown";
+import { parseMarkdownToPortableText, portableTextToMarkdown } from "@/lib/markdown";
 import { uploadImageAsset } from "@/action/uploadImageAsset";
 import { urlFor } from "@/sanity/lib/image";
+import Link from "next/link";
 
 const portableTextComponents = {
   marks: {
@@ -105,13 +107,41 @@ const portableTextComponents = {
   },
 };
 
-function CreatePostForm() {
+interface EditPostFormProps {
+  post: {
+    _id: string;
+    title: string;
+    body?: any;
+    flair?: string | null;
+    image?: any;
+    subreddit?: {
+      title?: string | null;
+      slug?: string | null | { current?: string | null };
+    } | null;
+  };
+}
+
+const FLAIRS = [
+  "Discussion",
+  "Question",
+  "News",
+  "Announcement",
+  "Media",
+  "Meme",
+  "Meta",
+];
+
+function EditPostForm({ post }: EditPostFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
+  const [title, setTitle] = useState(post.title || "");
+  const [body, setBody] = useState(post.body ? portableTextToMarkdown(post.body) : "");
+  const [flair, setFlair] = useState(post.flair || "");
   const [errorMessage, setErrorMessage] = useState("");
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    post.image && post.image.asset?._ref ? urlFor(post.image).url() : null
+  );
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [removeCurrentImage, setRemoveCurrentImage] = useState(false);
   const [activeTab, setActiveTab] = useState<"write" | "preview">("write");
   const [isUploadingInline, setIsUploadingInline] = useState(false);
 
@@ -120,18 +150,12 @@ function CreatePostForm() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const subreddit = searchParams.get("subreddit");
+  const communitySlug =
+    (post.subreddit as any)?.slug?.current ||
+    (post.subreddit as any)?.slug ||
+    "";
 
-  if (!subreddit) {
-    return (
-      <div className="text-center p-4">
-        <p>Please select a community first</p>
-      </div>
-    );
-  }
-
-  const handleCreatePost = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdatePost = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!title.trim()) {
@@ -157,40 +181,28 @@ function CreatePostForm() {
         fileType = imageFile.type;
       }
 
-      const result = await createPost({
+      const result = await updatePost({
+        postId: post._id,
         title: title.trim(),
-        subredditSlug: subreddit,
-        body: body.trim() || undefined,
+        body: body.trim() || "",
+        flair: flair || null,
         imageBase64: imageBase64,
         imageFilename: fileName,
         imageContentType: fileType,
+        removeCurrentImage,
       });
 
-      resetForm();
-      console.log("Finished creating post", result);
-
-      if ("error" in result && result.error) {
+      if (result.error) {
         setErrorMessage(result.error);
       } else {
-        router.push(`/c/${subreddit}`);
+        router.push(`/c/${communitySlug}/post/${post._id}`);
+        router.refresh();
       }
     } catch (err) {
-      console.error("Failed to create post", err);
-      setErrorMessage("Failed to create post");
+      console.error("Failed to update post", err);
+      setErrorMessage("Failed to update post");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const resetForm = () => {
-    setTitle("");
-    setBody("");
-    setErrorMessage("");
-    setImagePreview(null);
-    setImageFile(null);
-    setActiveTab("write");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
     }
   };
 
@@ -199,6 +211,7 @@ function CreatePostForm() {
 
     if (file) {
       setImageFile(file);
+      setRemoveCurrentImage(false);
       const reader = new FileReader();
       reader.onload = () => {
         const result = reader.result as string;
@@ -211,6 +224,7 @@ function CreatePostForm() {
   const removeImage = () => {
     setImagePreview(null);
     setImageFile(null);
+    setRemoveCurrentImage(true);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -277,7 +291,6 @@ function CreatePostForm() {
           const start = textarea.selectionStart;
           const end = textarea.selectionEnd;
           const text = textarea.value;
-          // Markdown format: ![alt](id)
           const markdownImage = `\n![${file.name}](${result.assetId})\n`;
           const newBody =
             text.substring(0, start) + markdownImage + text.substring(end);
@@ -303,14 +316,24 @@ function CreatePostForm() {
   const previewBlocks = body.trim() ? parseMarkdownToPortableText(body) : [];
 
   return (
-    <div className="mx-auto max-w-3xl px-4">
-      <form onSubmit={handleCreatePost} className="space-y-4 mt-2">
+    <div className="mx-auto max-w-3xl px-4 py-6">
+      <div className="flex items-center gap-2 mb-6">
+        <Link
+          href={`/c/${communitySlug}/post/${post._id}`}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5 text-gray-600" />
+        </Link>
+        <h1 className="text-xl font-bold text-gray-900">Edit Post</h1>
+      </div>
+
+      <form onSubmit={handleUpdatePost} className="space-y-5 bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
         {errorMessage && (
-          <div className="text-red-500 text-sm">{errorMessage}</div>
+          <div className="text-red-500 text-sm font-medium">{errorMessage}</div>
         )}
 
         <div className="space-y-2">
-          <label htmlFor="title" className="text-sm font-medium">
+          <label htmlFor="title" className="text-sm font-semibold text-gray-700">
             Title
           </label>
           <Input
@@ -325,9 +348,32 @@ function CreatePostForm() {
           />
         </div>
 
+        {/* Flair Selector */}
+        <div className="space-y-2">
+          <label htmlFor="flair" className="text-sm font-semibold text-gray-700">
+            Post Flair (optional)
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {FLAIRS.map((f) => (
+              <button
+                key={f}
+                type="button"
+                onClick={() => setFlair(flair === f ? "" : f)}
+                className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${
+                  flair === f
+                    ? "bg-orange-500 border-orange-500 text-white shadow-sm"
+                    : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label htmlFor="body" className="text-sm font-medium">
+            <label htmlFor="body" className="text-sm font-semibold text-gray-700">
               Body (optional)
             </label>
             <div className="flex border border-gray-200 rounded-md overflow-hidden text-xs">
@@ -390,7 +436,7 @@ function CreatePostForm() {
                   className="p-1 hover:bg-gray-200 rounded transition-colors"
                   title="Link"
                 >
-                  <Link className="w-4 h-4 text-gray-700" />
+                  <LinkIcon className="w-4 h-4 text-gray-700" />
                 </button>
                 <button
                   type="button"
@@ -441,7 +487,7 @@ function CreatePostForm() {
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 ref={textareaRef}
-                rows={8}
+                rows={10}
               />
 
               {isUploadingInline && (
@@ -459,27 +505,28 @@ function CreatePostForm() {
                   components={portableTextComponents}
                 />
               ) : (
-                <p className="text-gray-400 italic">Nothing to preview</p>
+                <p className="text-gray-400 italic font-normal">Nothing to preview</p>
               )}
             </div>
           )}
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Cover/Banner Image (optional)</label>
+          <label className="text-sm font-semibold text-gray-700">Cover/Banner Image (optional)</label>
 
           {imagePreview ? (
-            <div className="relative w-full h-64 mx-auto">
+            <div className="relative w-full h-64 mx-auto border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
               <Image
                 src={imagePreview}
                 alt="Post preview"
                 fill
                 className="object-contain"
+                unoptimized
               />
               <button
                 type="button"
                 onClick={removeImage}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold"
+                className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shadow-md transition-colors"
               >
                 ×
               </button>
@@ -488,7 +535,7 @@ function CreatePostForm() {
             <div className="flex items-center justify-center w-full">
               <label
                 htmlFor="post-image"
-                className="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                className="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors"
               >
                 <div className="flex flex-col items-center justify-center">
                   <ImageIcon className="w-6 h-6 mb-2 text-gray-400" />
@@ -510,16 +557,27 @@ function CreatePostForm() {
           )}
         </div>
 
-        <Button
-          type="submit"
-          className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 transition-colors"
-          disabled={isLoading}
-        >
-          {isLoading ? "Creating..." : "Post"}
-        </Button>
+        <div className="flex gap-3 pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={() => router.push(`/c/${communitySlug}/post/${post._id}`)}
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-medium"
+            disabled={isLoading}
+          >
+            {isLoading ? "Saving Changes..." : "Save Changes"}
+          </Button>
+        </div>
       </form>
     </div>
   );
 }
 
-export default CreatePostForm;
+export default EditPostForm;

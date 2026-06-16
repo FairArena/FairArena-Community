@@ -230,3 +230,67 @@ export function parseMarkdownToPortableText(text: string) {
   flushList();
   return blocks;
 }
+
+export function portableTextToMarkdown(blocks: any[]): string {
+  if (!blocks || !Array.isArray(blocks)) return "";
+
+  let currentListLevel = 0;
+
+  return blocks
+    .map((block) => {
+      if (block._type === "image") {
+        const alt = block.alt || "";
+        const refId = block.asset?._ref || "";
+        return `![${alt}](${refId})`;
+      }
+
+      if (block._type === "block") {
+        // Construct the inline text with marks
+        let blockText = "";
+        const markDefs = block.markDefs || [];
+
+        if (block.children && Array.isArray(block.children)) {
+          block.children.forEach((child: any) => {
+            let childText = child.text || "";
+            if (child.marks && Array.isArray(child.marks)) {
+              // Apply marks in reverse or standard order to generate correct MD syntax
+              child.marks.forEach((mark: string) => {
+                if (mark === "strong") {
+                  childText = `**${childText}**`;
+                } else if (mark === "em") {
+                  childText = `*${childText}*`;
+                } else if (mark === "code") {
+                  childText = `\`${childText}\``;
+                } else {
+                  // Check if it's a link mark ref
+                  const linkDef = markDefs.find((def: any) => def._key === mark);
+                  if (linkDef && linkDef._type === "link") {
+                    childText = `[${childText}](${linkDef.href})`;
+                  }
+                }
+              });
+            }
+            blockText += childText;
+          });
+        }
+
+        // Apply block styles
+        if (block.style === "h1") {
+          return `# ${blockText}`;
+        } else if (block.style === "h2") {
+          return `## ${blockText}`;
+        } else if (block.style === "h3") {
+          return `### ${blockText}`;
+        } else if (block.style === "blockquote") {
+          return `> ${blockText}`;
+        } else if (block.listItem === "bullet") {
+          return `- ${blockText}`;
+        } else {
+          return blockText;
+        }
+      }
+
+      return "";
+    })
+    .join("\n");
+}

@@ -8,7 +8,7 @@ import { getUserPostVoteStatus } from "@/sanity/lib/vote/getUserPostVoteStatus";
 import TimeAgo from "../TimeAgo";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Pencil } from "lucide-react";
 import CommentInput from "../comment/CommentInput";
 import CommentList from "../comment/CommentList";
 import PostVoteButtons from "./PostVoteButtons";
@@ -39,6 +39,8 @@ async function Post({ post, userId, isDetailPage = false }: PostProps) {
     (post.subreddit as any)?.slug ||
     "";
   const postDetailUrl = `/c/${communitySlug}/post/${post._id}`;
+
+  const isOwner = userId && post.author?._id === userId;
 
   // Flair color mapping
   const flairColors: Record<string, string> = {
@@ -169,6 +171,16 @@ async function Post({ post, userId, isDetailPage = false }: PostProps) {
       {/* Buttons */}
       <div className="absolute top-2 right-2">
         <div className="flex items-center gap-2">
+          {isOwner && (
+            <Link
+              href={`/c/${communitySlug}/post/${post._id}/edit`}
+              className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-orange-500 transition-colors mt-1"
+            >
+              <Pencil size={14} />
+              <span className="hidden md:block">Edit</span>
+            </Link>
+          )}
+
           <ReportButton contentId={post._id} isReported={post.isReported ?? false} />
 
           {post.author?._id && (

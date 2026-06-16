@@ -5,7 +5,7 @@ import { getUserBookmarkStatus } from "@/sanity/lib/bookmark/getUserBookmarkStat
 import TimeAgo from "../TimeAgo";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Pencil } from "lucide-react";
 import CommentInput from "../comment/CommentInput";
 import CommentList from "../comment/CommentList";
 import PostVoteButtons from "./PostVoteButtons";
@@ -60,6 +60,8 @@ export default async function PostDetail({ post, userId }: PostDetailProps) {
     (post.subreddit as any)?.slug?.current ||
     (post.subreddit as any)?.slug ||
     "";
+
+  const isOwner = userId && post.author?._id === userId;
 
   return (
     <article className="bg-white rounded-md shadow-sm border border-gray-200">
@@ -149,8 +151,18 @@ export default async function PostDetail({ post, userId }: PostDetailProps) {
             <ShareButton postId={post._id} communitySlug={communitySlug} />
           </div>
 
-          {/* Report/Delete */}
-          <div className="flex items-center gap-2 mb-4">
+          {/* Report/Delete/Edit */}
+          <div className="flex items-center gap-3 mb-4">
+            {isOwner && (
+              <Link
+                href={`/c/${communitySlug}/post/${post._id}/edit`}
+                className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-orange-500 transition-colors mt-0.5"
+              >
+                <Pencil size={14} />
+                <span>Edit Post</span>
+              </Link>
+            )}
+
             <ReportButton contentId={post._id} isReported={post.isReported ?? false} />
             {post.author?._id && (
               <DeleteButton
