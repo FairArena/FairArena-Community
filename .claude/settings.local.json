@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm add *)",
+      "Bash(cat)",
+      "Bash(bash /tmp/integration_check.sh)"
+    ]
+  }
+}

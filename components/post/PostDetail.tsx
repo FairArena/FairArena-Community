@@ -1,13 +1,12 @@
 import { getPostVotes } from "@/sanity/lib/vote/getPostVotes";
 import { getUserPostVoteStatus } from "@/sanity/lib/vote/getUserPostVoteStatus";
-import { getPostComments } from "@/sanity/lib/vote/getPostComments";
+import { getPostComments, CommentSortOrder } from "@/sanity/lib/vote/getPostComments";
 import { getUserBookmarkStatus } from "@/sanity/lib/bookmark/getUserBookmarkStatus";
 import TimeAgo from "../TimeAgo";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import { MessageSquare, Pencil } from "lucide-react";
 import CommentInput from "../comment/CommentInput";
-import CommentList from "../comment/CommentList";
 import PostVoteButtons from "./PostVoteButtons";
 import ReportButton from "../ReportButton";
 import DeleteButton from "../DeleteButton";
@@ -15,6 +14,38 @@ import PostBody from "./PostBody";
 import BookmarkButton from "./BookmarkButton";
 import ShareButton from "./ShareButton";
 import Link from "next/link";
+import { Suspense } from "react";
+import SortableCommentList from "../comment/SortableCommentList";
+import { getCommentReplies } from "@/sanity/lib/comment/getCommentReplies";
+
+async function CommentListWithRepliesAndSort({
+  postId,
+  comments,
+  userId,
+  initialSort,
+}: {
+  postId: string;
+  comments: any[];
+  userId: string | null;
+  initialSort: CommentSortOrder;
+}) {
+  // Pre-fetch replies for all root comments
+  const commentsWithReplies = await Promise.all(
+    comments.map(async (comment) => ({
+      ...comment,
+      replies: await getCommentReplies(comment._id, userId),
+    }))
+  );
+
+  return (
+    <SortableCommentList
+      postId={postId}
+      initialComments={commentsWithReplies}
+      userId={userId}
+      initialSort={initialSort}
+    />
+  );
+}
 
 interface PostDetailProps {
   post: {
@@ -38,22 +69,23 @@ interface PostDetailProps {
     } | null;
   };
   userId: string | null;
+  commentSort?: CommentSortOrder;
 }
 
 const flairColors: Record<string, string> = {
-  Discussion: "bg-blue-100 text-blue-700",
-  Question: "bg-purple-100 text-purple-700",
-  News: "bg-green-100 text-green-700",
-  Announcement: "bg-yellow-100 text-yellow-700",
-  Media: "bg-pink-100 text-pink-700",
-  Meme: "bg-orange-100 text-orange-700",
-  Meta: "bg-gray-100 text-gray-700",
+  Discussion: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+  Question: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+  News: "bg-green-500/10 text-green-600 dark:text-green-400",
+  Announcement: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400",
+  Media: "bg-pink-500/10 text-pink-600 dark:text-pink-400",
+  Meme: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+  Meta: "bg-muted text-muted-foreground",
 };
 
-export default async function PostDetail({ post, userId }: PostDetailProps) {
+export default async function PostDetail({ post, userId, commentSort = "best" }: PostDetailProps) {
   const votes = await getPostVotes(post._id);
   const vote = await getUserPostVoteStatus(post._id, userId);
-  const comments = await getPostComments(post._id, userId);
+  const comments = await getPostComments(post._id, userId, commentSort);
   const isBookmarked = await getUserBookmarkStatus(post._id, userId);
 
   const communitySlug =
@@ -64,7 +96,7 @@ export default async function PostDetail({ post, userId }: PostDetailProps) {
   const isOwner = userId && post.author?._id === userId;
 
   return (
-    <article className="bg-white rounded-md shadow-sm border border-gray-200">
+    <article className="bg-card rounded-md shadow-sm border border-border">
       <div className="flex">
         {/* Vote Buttons */}
         <PostVoteButtons
@@ -77,12 +109,12 @@ export default async function PostDetail({ post, userId }: PostDetailProps) {
         {/* Post Content */}
         <div className="flex-1 p-4">
           {/* Meta info */}
-          <div className="flex items-center gap-2 text-xs text-gray-500 mb-3 flex-wrap">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3 flex-wrap">
             {post.subreddit && (
               <>
                 <Link
                   href={`/c/${communitySlug}`}
-                  className="font-medium hover:underline text-gray-700"
+                  className="font-medium hover:underline text-foreground"
                 >
                   c/{post.subreddit.title}
                 </Link>
@@ -110,13 +142,13 @@ export default async function PostDetail({ post, userId }: PostDetailProps) {
               {post.flair && (
                 <span
                   className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 mt-1 ${
-                    flairColors[post.flair] || "bg-gray-100 text-gray-700"
+                    flairColors[post.flair] || "bg-muted text-muted-foreground"
                   }`}
                 >
                   {post.flair}
                 </span>
               )}
-              <h1 className="text-2xl font-bold text-gray-900 leading-snug">
+              <h1 className="text-2xl font-bold text-foreground leading-snug">
                 {post.title}
               </h1>
             </div>
@@ -131,7 +163,7 @@ export default async function PostDetail({ post, userId }: PostDetailProps) {
 
           {/* Image */}
           {post.image && post.image.asset?._ref && (
-            <div className="relative w-full h-80 mb-4 bg-gray-100/30">
+            <div className="relative w-full h-80 mb-4 bg-muted/30">
               <Image
                 src={urlFor(post.image).url()}
                 alt={post.image.alt || "Post image"}
@@ -142,8 +174,8 @@ export default async function PostDetail({ post, userId }: PostDetailProps) {
           )}
 
           {/* Action bar */}
-          <div className="flex items-center gap-2 py-2 border-b border-gray-100 mb-4">
-            <div className="flex items-center gap-1 text-sm text-gray-500">
+          <div className="flex items-center gap-2 py-2 border-b border-border mb-4">
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <MessageSquare className="w-4 h-4" />
               <span>{comments.length} Comments</span>
             </div>
@@ -156,7 +188,7 @@ export default async function PostDetail({ post, userId }: PostDetailProps) {
             {isOwner && (
               <Link
                 href={`/c/${communitySlug}/post/${post._id}/edit`}
-                className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-orange-500 transition-colors mt-0.5"
+                className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-orange-600 transition-colors mt-0.5"
               >
                 <Pencil size={14} />
                 <span>Edit Post</span>
@@ -175,7 +207,16 @@ export default async function PostDetail({ post, userId }: PostDetailProps) {
 
           {/* Comments */}
           <CommentInput postId={post._id} />
-          <CommentList postId={post._id} comments={comments} userId={userId} />
+          <Suspense
+            fallback={<div className="bg-card rounded-lg border border-border h-32 animate-pulse mt-6" />}
+          >
+            <CommentListWithRepliesAndSort
+              postId={post._id}
+              comments={comments}
+              userId={userId}
+              initialSort={commentSort}
+            />
+          </Suspense>
         </div>
       </div>
     </article>

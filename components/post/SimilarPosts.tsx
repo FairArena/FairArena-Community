@@ -32,18 +32,18 @@ export default async function SimilarPosts({ postId, flair, subredditId }: Simil
 
   // Flair color mapping
   const flairColors: Record<string, string> = {
-    Discussion: "bg-blue-100 text-blue-700",
-    Question: "bg-purple-100 text-purple-700",
-    News: "bg-green-100 text-green-700",
-    Announcement: "bg-yellow-100 text-yellow-700",
-    Media: "bg-pink-100 text-pink-700",
-    Meme: "bg-orange-100 text-orange-700",
-    Meta: "bg-gray-100 text-gray-700",
+    Discussion: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+    Question: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+    News: "bg-green-500/10 text-green-600 dark:text-green-400",
+    Announcement: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400",
+    Media: "bg-pink-500/10 text-pink-600 dark:text-pink-400",
+    Meme: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+    Meta: "bg-muted text-muted-foreground",
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden p-4 mt-6">
-      <h3 className="font-bold text-base text-gray-900 mb-4 border-b border-gray-100 pb-2">
+    <div className="bg-card rounded-lg border border-border overflow-hidden p-4 mt-6">
+      <h3 className="font-bold text-base text-foreground mb-4 border-b border-border pb-2">
         Similar Posts
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -54,11 +54,11 @@ export default async function SimilarPosts({ postId, flair, subredditId }: Simil
           return (
             <div
               key={p._id}
-              className="flex flex-col border border-gray-150 rounded-md p-3 hover:border-orange-200 transition-colors bg-gray-50/50"
+              className="flex flex-col border border-border rounded-md p-3 hover:border-orange-500/50 transition-colors bg-muted/30"
             >
               {/* Meta */}
-              <div className="flex items-center gap-1.5 text-[10px] text-gray-500 mb-2 flex-wrap">
-                <Link href={`/c/${communitySlug}`} className="font-medium hover:underline text-gray-700">
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-2 flex-wrap">
+                <Link href={`/c/${communitySlug}`} className="font-medium hover:underline text-foreground">
                   c/{p.subreddit?.title}
                 </Link>
                 <span>•</span>
@@ -67,13 +67,13 @@ export default async function SimilarPosts({ postId, flair, subredditId }: Simil
 
               {/* Title & Flair */}
               <div className="flex-1 mb-2">
-                <Link href={postDetailUrl} className="font-semibold text-sm text-gray-900 hover:text-orange-600 transition-colors line-clamp-2 leading-tight">
+                <Link href={postDetailUrl} className="font-semibold text-sm text-foreground hover:text-orange-600 transition-colors line-clamp-2 leading-tight">
                   {p.title}
                 </Link>
                 {p.flair && (
                   <span
                     className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mt-1.5 ${
-                      flairColors[p.flair] || "bg-gray-100 text-gray-700"
+                      flairColors[p.flair] || "bg-muted text-muted-foreground"
                     }`}
                   >
                     {p.flair}
@@ -83,7 +83,7 @@ export default async function SimilarPosts({ postId, flair, subredditId }: Simil
 
               {/* Image thumbnail (if exists) */}
               {p.image && p.image.asset?._ref && (
-                <div className="relative w-full h-24 mb-2 bg-gray-100/50 rounded overflow-hidden">
+                <div className="relative w-full h-24 mb-2 bg-muted/50 rounded overflow-hidden">
                   <Image
                     src={urlFor(p.image).url()}
                     alt={p.image.alt || "Thumbnail"}
@@ -94,7 +94,7 @@ export default async function SimilarPosts({ postId, flair, subredditId }: Simil
               )}
 
               {/* Comments count */}
-              <div className="flex items-center gap-1 text-[11px] text-gray-500 mt-auto pt-2 border-t border-gray-100">
+              <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-auto pt-2 border-t border-border">
                 <MessageSquare className="w-3.5 h-3.5" />
                 <span>{p.commentsCount} Comments</span>
               </div>

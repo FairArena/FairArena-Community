@@ -15,7 +15,7 @@ const portableTextComponents = {
       try {
         const imageUrl = urlFor(value).url();
         return (
-          <div className="relative w-full h-80 my-4 bg-gray-100/30">
+          <div className="relative w-full h-80 my-4 bg-muted/30">
             <Image
               src={imageUrl || "/placeholder.png"}
               alt={value.alt || "Inline post image"}
@@ -46,40 +46,40 @@ const portableTextComponents = {
       );
     },
     strong: ({ children }: any) => (
-      <strong className="font-bold text-gray-950">{children}</strong>
+      <strong className="font-bold text-foreground">{children}</strong>
     ),
     em: ({ children }: any) => <em className="italic">{children}</em>,
     code: ({ children }: any) => (
-      <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm text-red-600 border border-gray-200">
+      <code className="bg-muted px-1.5 py-0.5 rounded font-mono text-sm text-red-600 border border-border">
         {children}
       </code>
     ),
   },
   block: {
     normal: ({ children }: any) => (
-      <p className="mb-2 last:mb-0 leading-relaxed text-gray-800">{children}</p>
+      <p className="mb-2 last:mb-0 leading-relaxed text-foreground">{children}</p>
     ),
     h1: ({ children }: any) => (
-      <h1 className="text-xl font-bold mb-2 text-gray-950">{children}</h1>
+      <h1 className="text-xl font-bold mb-2 text-foreground">{children}</h1>
     ),
     h2: ({ children }: any) => (
-      <h2 className="text-lg font-bold mb-2 text-gray-950">{children}</h2>
+      <h2 className="text-lg font-bold mb-2 text-foreground">{children}</h2>
     ),
     h3: ({ children }: any) => (
-      <h3 className="text-md font-semibold mb-1 text-gray-950">{children}</h3>
+      <h3 className="text-md font-semibold mb-1 text-foreground">{children}</h3>
     ),
     blockquote: ({ children }: any) => (
-      <blockquote className="border-l-4 border-gray-300 pl-4 italic my-2 text-gray-600 bg-gray-50 py-1 pr-2 rounded-r">
+      <blockquote className="border-l-4 border-border pl-4 italic my-2 text-muted-foreground bg-muted py-1 pr-2 rounded-r">
         {children}
       </blockquote>
     ),
   },
   list: {
     bullet: ({ children }: any) => (
-      <ul className="list-disc pl-5 mb-2 space-y-1 text-gray-700">{children}</ul>
+      <ul className="list-disc pl-5 mb-2 space-y-1 text-foreground">{children}</ul>
     ),
     number: ({ children }: any) => (
-      <ol className="list-decimal pl-5 mb-2 space-y-1 text-gray-700">{children}</ol>
+      <ol className="list-decimal pl-5 mb-2 space-y-1 text-foreground">{children}</ol>
     ),
   },
   listItem: {
@@ -91,14 +91,16 @@ const portableTextComponents = {
 interface PostBodyProps {
   body: any;
   isDetailPage?: boolean;
+  isSpoiler?: boolean;
 }
 
 const MAX_HEIGHT = 150;
 
-export default function PostBody({ body, isDetailPage = false }: PostBodyProps) {
+export default function PostBody({ body, isDetailPage = false, isSpoiler = false }: PostBodyProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const [expanded, setExpanded] = useState(isDetailPage);
+  const [spoilerRevealed, setSpoilerRevealed] = useState(false);
 
   useEffect(() => {
     if (isDetailPage) {
@@ -115,12 +117,24 @@ export default function PostBody({ body, isDetailPage = false }: PostBodyProps) 
     }
   }, [body, isDetailPage]);
 
+  if (isSpoiler && !spoilerRevealed) {
+    return (
+      <button
+        onClick={() => setSpoilerRevealed(true)}
+        className="w-full py-8 px-4 bg-muted hover:bg-muted/80 rounded border border-border transition-colors flex items-center justify-center gap-2 font-semibold text-foreground"
+      >
+        <span>Spoiler</span>
+        <span className="text-sm text-muted-foreground">Click to reveal</span>
+      </button>
+    );
+  }
+
   return (
     <div className="relative">
       <div
         ref={contentRef}
         style={!expanded ? { maxHeight: `${MAX_HEIGHT}px`, overflow: "hidden" } : undefined}
-        className="prose prose-sm max-w-none text-gray-700 leading-relaxed"
+        className="prose prose-sm max-w-none text-foreground leading-relaxed"
       >
         <PortableText value={body as any} components={portableTextComponents} />
       </div>
@@ -128,7 +142,7 @@ export default function PostBody({ body, isDetailPage = false }: PostBodyProps) 
       {/* Gradient overlay + expand button when overflowing and collapsed */}
       {isOverflowing && !expanded && (
         <div className="relative">
-          <div className="absolute -top-10 left-0 right-0 h-10 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+          <div className="absolute -top-10 left-0 right-0 h-10 bg-gradient-to-t from-card via-card/80 to-transparent pointer-events-none" />
           <button
             onClick={() => setExpanded(true)}
             className="mt-1 flex items-center gap-1 text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors"
@@ -143,7 +157,7 @@ export default function PostBody({ body, isDetailPage = false }: PostBodyProps) 
       {isOverflowing && expanded && !isDetailPage && (
         <button
           onClick={() => setExpanded(false)}
-          className="mt-2 flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
+          className="mt-2 flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           <ChevronUp className="w-4 h-4" />
           Collapse

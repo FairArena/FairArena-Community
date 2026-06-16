@@ -98,6 +98,39 @@ export const postType = defineType({
         ],
       },
     }),
+    defineField({
+      name: "isNSFW",
+      title: "NSFW",
+      type: "boolean",
+      description: "Mark post as Not Safe For Work",
+      initialValue: false,
+    }),
+    defineField({
+      name: "isSpoiler",
+      title: "Spoiler",
+      type: "boolean",
+      description: "Mark post as spoiler",
+      initialValue: false,
+    }),
+    defineField({
+      name: "postType",
+      title: "Post Type",
+      type: "string",
+      description: "Type of post",
+      options: {
+        list: [
+          { title: "Text", value: "text" },
+          { title: "Link", value: "link" },
+        ],
+      },
+      initialValue: "text",
+    }),
+    defineField({
+      name: "linkUrl",
+      title: "Link URL",
+      type: "url",
+      description: "URL for link posts",
+    }),
   ],
   preview: {
     select: {

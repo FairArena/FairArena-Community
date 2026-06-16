@@ -15,6 +15,7 @@ interface CommunitySidebarProps {
       imageUrl?: string | null;
     } | null;
     _createdAt?: string;
+    rules?: Array<{ title: string; description?: string }>;
   };
   isMember: boolean;
   memberCount: number;
@@ -32,7 +33,7 @@ export default async function CommunitySidebar({
   return (
     <aside className="space-y-4">
       {/* About Community */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-card rounded-lg border border-border overflow-hidden">
         <div className="bg-gradient-to-br from-orange-500 to-red-500 p-3">
           <h2 className="text-white font-bold text-sm uppercase tracking-wide">
             About Community
@@ -40,7 +41,7 @@ export default async function CommunitySidebar({
         </div>
         <div className="p-4 space-y-4">
           {community.description && (
-            <p className="text-sm text-gray-700 leading-relaxed">{community.description}</p>
+            <p className="text-sm text-foreground leading-relaxed">{community.description}</p>
           )}
 
           {/* Member Count */}
@@ -53,15 +54,15 @@ export default async function CommunitySidebar({
                 memberCount={memberCount}
               />
             ) : (
-              <p className="text-sm text-gray-600">
-                <span className="font-semibold">{memberCount.toLocaleString()}</span> members
+              <p className="text-sm text-muted-foreground">
+                <span className="font-semibold text-foreground">{memberCount.toLocaleString()}</span> members
               </p>
             )}
           </div>
 
           {/* Creation Date */}
           {community._createdAt && (
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="w-4 h-4 flex-shrink-0" />
               <span>
                 Created{" "}
@@ -78,7 +79,7 @@ export default async function CommunitySidebar({
           {community.moderator?.username && (
             <div className="flex items-center gap-2 text-sm">
               <Shield className="w-4 h-4 text-orange-500 flex-shrink-0" />
-              <span className="text-gray-500">Moderated by</span>
+              <span className="text-muted-foreground">Moderated by</span>
               <Link
                 href={`/u/${community.moderator.username}`}
                 className="text-orange-600 hover:underline font-medium"
@@ -99,50 +100,53 @@ export default async function CommunitySidebar({
       </div>
 
       {/* Community Rules */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="p-3 border-b border-gray-100">
-          <h3 className="font-bold text-sm text-gray-900">Community Rules</h3>
+      <div className="bg-card rounded-lg border border-border overflow-hidden">
+        <div className="p-3 border-b border-border">
+          <h3 className="font-bold text-sm text-foreground">Community Rules</h3>
         </div>
         <div className="p-4">
-          <ol className="space-y-3 text-sm text-gray-600">
-            {[
-              "Be respectful and civil",
-              "No spam or self-promotion",
-              "Stay on topic",
-              "No misinformation",
-              "Follow site-wide rules",
-            ].map((rule, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="font-bold text-gray-400 flex-shrink-0">{i + 1}.</span>
-                <span>{rule}</span>
-              </li>
-            ))}
-          </ol>
+          {community.rules && community.rules.length > 0 ? (
+            <ol className="space-y-3 text-sm text-foreground">
+              {community.rules.map((rule, i) => (
+                <li key={i} className="flex gap-2">
+                  <span className="font-bold text-muted-foreground flex-shrink-0">{i + 1}.</span>
+                  <div className="flex-1">
+                    <div className="font-medium">{rule.title}</div>
+                    {rule.description && (
+                      <div className="text-xs text-muted-foreground mt-1">{rule.description}</div>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm text-muted-foreground">No rules set for this community.</p>
+          )}
         </div>
       </div>
 
       {/* Related Communities */}
       {related.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <div className="p-3 border-b border-gray-100">
-            <h3 className="font-bold text-sm text-gray-900">Related Communities</h3>
+        <div className="bg-card rounded-lg border border-border overflow-hidden">
+          <div className="p-3 border-b border-border">
+            <h3 className="font-bold text-sm text-foreground">Related Communities</h3>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-border">
             {related.map((sub: any) => (
               <Link
                 key={sub._id}
                 href={`/c/${sub.slug}`}
-                className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors group"
+                className="flex items-center justify-between p-3 hover:bg-muted transition-colors group"
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-900 group-hover:text-orange-600 transition-colors">
+                  <p className="text-sm font-medium text-foreground group-hover:text-orange-600 transition-colors">
                     c/{sub.title}
                   </p>
                   {sub.description && (
-                    <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{sub.description}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{sub.description}</p>
                   )}
                 </div>
-                <ExternalLink className="w-3.5 h-3.5 text-gray-400 group-hover:text-orange-500 transition-colors flex-shrink-0" />
+                <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-hover:text-orange-500 transition-colors flex-shrink-0" />
               </Link>
             ))}
           </div>

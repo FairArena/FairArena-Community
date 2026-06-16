@@ -142,7 +142,7 @@ function CreateCommunityButton() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
-        className="w-full p-2 pl-5 flex items-center rounded-md cursor-pointer bg-black text-white hover:bg-black transition-all duration-200 disabled:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full p-2 pl-5 flex items-center rounded-md cursor-pointer bg-foreground text-background hover:bg-foreground/90 transition-all duration-200 disabled:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={!user}
       >
         <Plus className="w-4 h-4 mr-2" />
@@ -161,14 +161,14 @@ function CreateCommunityButton() {
             )}
 
             <div className="space-y-2">
-              <label htmlFor="name" className="text-sm font-medium">
+              <label htmlFor="name" className="text-sm font-medium text-foreground">
                 Community Name
               </label>
               <Input
                 id="name"
                 name="name"
                 placeholder="My Community"
-                className="w-full focus:ring-2 focus:ring-blue-500"
+                className="w-full"
                 value={name}
                 onChange={handleNameChange}
                 required
@@ -178,14 +178,14 @@ function CreateCommunityButton() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="slug" className="text-sm font-medium">
+              <label htmlFor="slug" className="text-sm font-medium text-foreground">
                 Community Slug (URL)
               </label>
               <Input
                 id="slug"
                 name="slug"
                 placeholder="my-community"
-                className="w-full focus:ring-2 focus:ring-blue-500"
+                className="w-full"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 required
@@ -194,21 +194,21 @@ function CreateCommunityButton() {
                 pattern="[a-z0-9-]+"
                 title="Lowercase letters, numbers, and hyphens only"
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 This will be used in the URL: community.fairarena.app/c/
                 {slug || "community-slug"}
               </p>
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="description" className="text-sm font-medium">
+              <label htmlFor="description" className="text-sm font-medium text-foreground">
                 Description
               </label>
               <Textarea
                 id="description"
                 name="description"
                 placeholder="What is this community about?"
-                className="w-full focus:ring-2 focus:ring-blue-500"
+                className="w-full"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
@@ -217,7 +217,7 @@ function CreateCommunityButton() {
 
             {/* Image */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">
+              <label className="text-sm font-medium text-foreground">
                 Community Image (optional)
               </label>
 
@@ -241,11 +241,11 @@ function CreateCommunityButton() {
                 <div className="flex items-center justify-center w-full">
                   <label
                     htmlFor="community-image"
-                    className="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                    className="flex flex-col items-center justify-center w-full h-24 border-2 border-border border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80 transition-colors"
                   >
                     <div className="flex flex-col items-center justify-center">
-                      <ImageIcon className="w-6 h-6 mb-2 text-gray-400" />
-                      <p className="text-xs text-gray-500">
+                      <ImageIcon className="w-6 h-6 mb-2 text-muted-foreground" />
+                      <p className="text-xs text-muted-foreground">
                         Click to upload an image
                       </p>
                     </div>
@@ -265,7 +265,7 @@ function CreateCommunityButton() {
 
             <Button
               type="submit"
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isPending || !user}
             >
               {isPending

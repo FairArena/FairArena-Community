@@ -3,7 +3,18 @@ import { defineQuery } from "groq";
 
 export async function getUserByUsername(username: string) {
   const getUserByUsernameQuery = defineQuery(
-    `*[_type == "user" && username == $username][0]`
+    `*[_type == "user" && username == $username][0]{
+      _id,
+      username,
+      displayName,
+      bio,
+      bannerColor,
+      imageUrl,
+      email,
+      joinedAt,
+      following[]->,
+      _createdAt
+    }`
   );
 
   const result = await sanityFetch({
@@ -20,6 +31,7 @@ export async function getUserByUsername(username: string) {
     displayName?: string;
     bio?: string;
     bannerColor?: string;
-    following?: { _ref: string }[];
+    following?: any[];
+    _createdAt?: string;
   } | null;
 }

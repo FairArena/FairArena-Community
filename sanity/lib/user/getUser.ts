@@ -40,7 +40,18 @@ export async function getUser(): Promise<UserResult | { error: string }> {
 
     // Check if user exists in the database first
     const getExistingUserQuery = defineQuery(
-      `*[_type == "user" && _id == $id][0]`
+      `*[_type == "user" && _id == $id][0]{
+        _id,
+        username,
+        imageUrl,
+        email,
+        joinedAt,
+        displayName,
+        bio,
+        bannerColor,
+        following[]->,
+        _createdAt
+      }`
     );
 
     console.log("Checking if user exists in Sanity database");

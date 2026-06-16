@@ -68,7 +68,7 @@ export default function NotificationBell() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors focus:outline-none">
+        <button className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors focus:outline-none">
           <Bell className="w-5 h-5" />
           {unreadCount > 0 && (
             <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm">
@@ -77,12 +77,12 @@ export default function NotificationBell() {
           )}
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0 shadow-lg border border-gray-200 bg-white mr-4" align="end">
-        <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2.5 bg-gray-50/50 rounded-t-lg">
-          <h3 className="font-bold text-sm text-gray-900 flex items-center gap-1.5">
+      <PopoverContent className="w-80 p-0 shadow-lg border border-border bg-card mr-4" align="end">
+        <div className="flex items-center justify-between border-b border-border px-4 py-2.5 bg-muted/50 rounded-t-lg">
+          <h3 className="font-bold text-sm text-foreground flex items-center gap-1.5">
             Notifications
             {unreadCount > 0 && (
-              <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-medium">
+              <span className="text-xs bg-red-500/10 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded-full font-medium">
                 {unreadCount} new
               </span>
             )}
@@ -97,7 +97,7 @@ export default function NotificationBell() {
             </button>
           )}
         </div>
-        <div className="max-h-72 overflow-y-auto divide-y divide-gray-100">
+        <div className="max-h-72 overflow-y-auto divide-y divide-border">
           {notifications.length > 0 ? (
             notifications.map((n) => {
               const communitySlug =
@@ -108,13 +108,13 @@ export default function NotificationBell() {
                 <div
                   key={n._id}
                   onClick={() => handleMarkSingleRead(n._id)}
-                  className={`p-3 transition-colors text-left flex gap-3 hover:bg-gray-50 cursor-pointer ${
-                    !n.read ? "bg-orange-50/30" : ""
+                  className={`p-3 transition-colors text-left flex gap-3 hover:bg-muted cursor-pointer ${
+                    !n.read ? "bg-orange-500/10" : ""
                   }`}
                 >
                   <div className="flex-shrink-0">
                     {n.sender?.imageUrl ? (
-                      <div className="relative w-8 h-8 rounded-full overflow-hidden border">
+                      <div className="relative w-8 h-8 rounded-full overflow-hidden border border-border">
                         <Image
                           src={n.sender.imageUrl}
                           alt={n.sender.username}
@@ -124,14 +124,14 @@ export default function NotificationBell() {
                         />
                       </div>
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-400 text-sm">
+                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center font-bold text-muted-foreground text-sm">
                         {n.sender?.username?.[0]?.toUpperCase()}
                       </div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs text-gray-800 leading-normal">
-                      <span className="font-semibold text-gray-950">u/{n.sender?.username || "Anonymous"}</span>{" "}
+                    <div className="text-xs text-foreground leading-normal">
+                      <span className="font-semibold text-foreground">u/{n.sender?.username || "Anonymous"}</span>{" "}
                       {n.type === "upvote" && (
                         <span className="inline-flex items-center gap-0.5 text-orange-600">
                           upvoted your post <ArrowUp className="w-3 h-3" />
@@ -152,19 +152,19 @@ export default function NotificationBell() {
                     <Link
                       href={url}
                       onClick={() => setOpen(false)}
-                      className="block text-xs font-medium text-gray-500 hover:text-orange-600 truncate mt-1 transition-colors"
+                      className="block text-xs font-medium text-muted-foreground hover:text-orange-600 dark:hover:text-orange-400 truncate mt-1 transition-colors"
                       title={n.post?.title}
                     >
                       "{n.post?.title}"
                     </Link>
 
                     {n.comment?.content && (
-                      <p className="text-[11px] text-gray-500 line-clamp-1 italic mt-0.5 pl-2 border-l-2 border-gray-200">
+                      <p className="text-[11px] text-muted-foreground line-clamp-1 italic mt-0.5 pl-2 border-l-2 border-border">
                         {n.comment.content}
                       </p>
                     )}
 
-                    <div className="text-[10px] text-gray-400 mt-1">
+                    <div className="text-[10px] text-muted-foreground/60 mt-1">
                       <TimeAgo date={new Date(n.createdAt)} />
                     </div>
                   </div>
@@ -172,7 +172,7 @@ export default function NotificationBell() {
               );
             })
           ) : (
-            <div className="p-8 text-center text-gray-400 text-xs italic">
+            <div className="p-8 text-center text-muted-foreground/60 text-xs italic">
               No notifications yet
             </div>
           )}

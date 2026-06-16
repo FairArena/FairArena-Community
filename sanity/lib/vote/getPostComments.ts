@@ -1,8 +1,23 @@
 import { defineQuery } from "groq";
 import { sanityFetch } from "../live";
 
-// Get all top-level comments for a post
-export async function getPostComments(postId: string, userId: string | null) {
+export type CommentSortOrder = "best" | "new" | "top" | "controversial";
+
+// Get all top-level comments for a post with sorting options
+export async function getPostComments(
+  postId: string,
+  userId: string | null,
+  sort: CommentSortOrder = "best"
+) {
+  const orderClause =
+    sort === "top"
+      ? "order(votes.netScore desc, createdAt desc)"
+      : sort === "new"
+        ? "order(createdAt desc)"
+        : sort === "controversial"
+          ? "order(abs(votes.upvotes - votes.downvotes) desc)"
+          : "order(votes.netScore desc, createdAt desc)"; // best (default)
+
   const getPostCommentsQuery = defineQuery(`
     *[_type == "comment" && post._ref == $postId && !defined(parentComment)] {
         ...,
@@ -17,7 +32,7 @@ export async function getPostComments(postId: string, userId: string | null) {
         "netScore": count(*[_type == "vote" && comment._ref == ^._id && voteType == "upvote"]) - count(*[_type == "vote" && comment._ref == ^._id && voteType == "downvote"]),
         "voteStatus": *[_type == "vote" && comment._ref == ^._id && user._ref == $userId][0].voteType,
       },
-    } | order(votes.netScore desc, createdAt desc) // votes.netScore desc -> if you want to sort by net score
+    } | ${orderClause}
   `);
 
   const result = await sanityFetch({

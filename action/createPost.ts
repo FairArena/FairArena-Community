@@ -31,6 +31,11 @@ export async function createPost({
   title,
   subredditSlug,
   body,
+  linkUrl,
+  postType = "text",
+  flair,
+  isNSFW = false,
+  isSpoiler = false,
   imageBase64,
   imageFilename,
   imageContentType,
@@ -38,6 +43,11 @@ export async function createPost({
   title: string;
   subredditSlug: string;
   body?: string;
+  linkUrl?: string;
+  postType?: "text" | "link";
+  flair?: string;
+  isNSFW?: boolean;
+  isSpoiler?: boolean;
   imageBase64?: string | null;
   imageFilename?: string | null;
   imageContentType?: string | null;
@@ -135,7 +145,7 @@ export async function createPost({
     const postDoc: Partial<Post> = {
       _type: "post",
       title,
-      body: body ? parseMarkdownToPortableText(body) : undefined,
+      body: postType === "text" && body ? parseMarkdownToPortableText(body) : undefined,
       author: {
         _type: "reference",
         _ref: user._id,
@@ -145,6 +155,11 @@ export async function createPost({
         _ref: resolvedSubredditId,
       },
       publishedAt: new Date().toISOString(),
+      flair: flair || undefined,
+      isNSFW,
+      isSpoiler,
+      postType,
+      linkUrl: postType === "link" ? linkUrl : undefined,
     };
 
     // Add image if available

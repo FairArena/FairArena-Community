@@ -13,7 +13,11 @@ export async function getPostById(postId: string) {
     image,
     isDeleted,
     isReported,
-    flair
+    flair,
+    isNSFW,
+    isSpoiler,
+    postType,
+    linkUrl
   }[0]`);
 
   const post = await sanityFetch({

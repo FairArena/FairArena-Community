@@ -136,7 +136,7 @@ export default function EditCommunityDialog({
 
         <form onSubmit={handleUpdate} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="edit-name" className="text-sm font-medium">
+            <label htmlFor="edit-name" className="text-sm font-medium text-foreground">
               Community Name
             </label>
             <Input
@@ -150,7 +150,7 @@ export default function EditCommunityDialog({
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="edit-description" className="text-sm font-medium">
+            <label htmlFor="edit-description" className="text-sm font-medium text-foreground">
               Description (optional)
             </label>
             <Textarea
@@ -164,7 +164,7 @@ export default function EditCommunityDialog({
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-medium block">Community Logo</label>
+            <label className="text-sm font-medium block text-foreground">Community Logo</label>
 
             {imagePreview ? (
               <div className="relative w-20 h-20 rounded-full overflow-hidden border mx-auto mb-2 group">
@@ -186,11 +186,11 @@ export default function EditCommunityDialog({
               <div className="flex items-center justify-center w-full">
                 <label
                   htmlFor="edit-community-image"
-                  className="flex flex-col items-center justify-center w-full h-20 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                  className="flex flex-col items-center justify-center w-full h-20 border-2 border-border border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80 transition-colors"
                 >
                   <div className="flex flex-col items-center justify-center pt-2">
-                    <ImageIcon className="w-5 h-5 mb-1 text-gray-400" />
-                    <p className="text-xs text-gray-500">Upload new image</p>
+                    <ImageIcon className="w-5 h-5 mb-1 text-muted-foreground" />
+                    <p className="text-xs text-muted-foreground">Upload new image</p>
                   </div>
                   <input
                     id="edit-community-image"
@@ -207,7 +207,7 @@ export default function EditCommunityDialog({
 
           <Button
             type="submit"
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 transition-colors mt-2"
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 transition-colors mt-2"
             disabled={isPending}
           >
             {isPending ? "Saving..." : "Save Settings"}

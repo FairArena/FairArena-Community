@@ -34,8 +34,8 @@ export default function BookmarkButton({ postId, initialIsBookmarked }: Bookmark
       title={isBookmarked ? "Remove bookmark" : "Save post"}
       className={`flex items-center gap-1 px-2 py-1.5 rounded text-sm transition-colors ${
         isBookmarked
-          ? "text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100"
-          : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+          ? "text-orange-600 hover:text-orange-700 bg-orange-500/10 hover:bg-orange-500/20 dark:text-orange-400 dark:hover:text-orange-300"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted"
       } disabled:opacity-60 disabled:cursor-not-allowed`}
     >
       {isPending ? (

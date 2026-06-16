@@ -45,8 +45,8 @@ export default function ShareButton({ postId, communitySlug }: ShareButtonProps)
       title="Share post"
       className={`flex items-center gap-1 px-2 py-1.5 rounded text-sm transition-colors ${
         copied
-          ? "text-green-600 bg-green-50"
-          : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+          ? "text-green-600 bg-green-500/10 dark:text-green-400"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted"
       }`}
     >
       {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}

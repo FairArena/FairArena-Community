@@ -91,7 +91,7 @@ export default function EditProfileDialog({ userProfile }: EditProfileDialogProp
 
         <form onSubmit={handleUpdate} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="display-name" className="text-sm font-semibold text-gray-700">
+            <label htmlFor="display-name" className="text-sm font-semibold text-foreground">
               Display Name
             </label>
             <Input
@@ -104,7 +104,7 @@ export default function EditProfileDialog({ userProfile }: EditProfileDialogProp
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="bio" className="text-sm font-semibold text-gray-700">
+            <label htmlFor="bio" className="text-sm font-semibold text-foreground">
               Bio
             </label>
             <Textarea
@@ -118,7 +118,7 @@ export default function EditProfileDialog({ userProfile }: EditProfileDialogProp
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-gray-700 block">
+            <label className="text-sm font-semibold text-foreground block">
               Profile Banner Style
             </label>
             <div className="grid grid-cols-3 gap-2">

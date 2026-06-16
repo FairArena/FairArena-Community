@@ -15,7 +15,11 @@ export async function getSimilarPosts(postId: string, flair: string | null, subr
       "subreddit": subreddit->,
       image,
       isDeleted,
-      isReported
+      isReported,
+      isNSFW,
+      isSpoiler,
+      postType,
+      linkUrl
     } | order(publishedAt desc)
   `);
 

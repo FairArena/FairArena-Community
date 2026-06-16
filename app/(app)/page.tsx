@@ -25,12 +25,12 @@ export default async function Home({ searchParams }: HomePageProps) {
   return (
     <>
       {/* Banner */}
-      <section className="bg-white border-b">
+      <section className="bg-card border-b border-border">
         <div className="mx-auto max-w-7xl px-4 py-4">
           <div className="flex items-center">
             <div>
-              <h1 className="text-2xl font-bold">Home</h1>
-              <p className="text-sm text-gray-600">
+              <h1 className="text-2xl font-bold text-foreground">Home</h1>
+              <p className="text-sm text-muted-foreground">
                 Recent posts from all communities
               </p>
             </div>
@@ -45,7 +45,7 @@ export default async function Home({ searchParams }: HomePageProps) {
             {/* Left: Posts */}
             <div className="flex-1 min-w-0">
               {/* Sort Tabs */}
-              <div className="bg-white rounded-lg border border-gray-200 p-2 flex gap-1 mb-4">
+              <div className="bg-card rounded-lg border border-border p-2 flex gap-1 mb-4">
                 {sortTabs.map((tab) => (
                   <Link
                     key={tab.key}
@@ -53,7 +53,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-semibold transition-colors ${
                       sort === tab.key
                         ? "bg-orange-100 text-orange-700"
-                        : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     }`}
                   >
                     {tab.icon}
@@ -68,7 +68,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                     {[1, 2, 3].map((i) => (
                       <div
                         key={i}
-                        className="bg-white rounded-md border border-gray-200 h-40 animate-pulse"
+                        className="bg-card rounded-md border border-border h-40 animate-pulse"
                       />
                     ))}
                   </div>
@@ -81,7 +81,7 @@ export default async function Home({ searchParams }: HomePageProps) {
             {/* Right: Sidebar */}
             <div className="hidden lg:block w-80 flex-shrink-0">
               <Suspense
-                fallback={<div className="bg-white rounded-lg border border-gray-200 h-64 animate-pulse" />}
+                fallback={<div className="bg-card rounded-lg border border-border h-64 animate-pulse" />}
               >
                 <HomeSidebar />
               </Suspense>

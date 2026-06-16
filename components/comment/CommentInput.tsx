@@ -38,18 +38,20 @@ function CommentInput({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 mt-2">
+    <form onSubmit={handleSubmit} className="flex gap-2 mt-4 mb-6 p-4 bg-card rounded-lg border border-border">
       <Input
         value={content}
         onChange={(e) => setContent(e.target.value)}
         type="text"
         placeholder={user ? "Add a comment..." : "Sign in to comment"}
         disabled={isPending || !user}
+        className="flex-1"
       />
       <Button
         type="submit"
-        variant="outline"
+        variant="default"
         disabled={isPending || !user || content.length === 0}
+        size="sm"
       >
         {isPending ? "Commenting..." : "Comment"}
       </Button>

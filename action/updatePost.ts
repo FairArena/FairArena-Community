@@ -10,6 +10,8 @@ export async function updatePost({
   title,
   body,
   flair,
+  isNSFW,
+  isSpoiler,
   imageBase64,
   imageFilename,
   imageContentType,
@@ -19,6 +21,8 @@ export async function updatePost({
   title: string;
   body?: string;
   flair?: string | null;
+  isNSFW?: boolean;
+  isSpoiler?: boolean;
   imageBase64?: string | null;
   imageFilename?: string | null;
   imageContentType?: string | null;
@@ -54,6 +58,14 @@ export async function updatePost({
     // Update flair
     if (flair !== undefined) {
       patch.set({ flair: flair || null });
+    }
+
+    // Update NSFW and Spoiler
+    if (isNSFW !== undefined) {
+      patch.set({ isNSFW });
+    }
+    if (isSpoiler !== undefined) {
+      patch.set({ isSpoiler });
     }
 
     // Handle cover image

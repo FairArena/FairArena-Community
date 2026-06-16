@@ -102,24 +102,24 @@ function PostVoteButtons({
   };
 
   return (
-    <div className="flex flex-col items-center bg-gray-50 p-2 rounded-l-md">
+    <div className="flex flex-col items-center bg-muted/50 p-2 rounded-l-md">
       <button
         disabled={!isSignedIn || isPending || !user}
         onClick={handleUpvote}
         className={`p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed ${
-          optimisticVote === "upvote" ? "bg-orange-100" : "hover:bg-gray-100"
+          optimisticVote === "upvote" ? "bg-orange-500/10" : "hover:bg-muted"
         } ${isPending ? "opacity-50 cursor-not-allowed" : ""}`}
       >
         <ArrowUp
           className={`w-5 h-5 ${
             optimisticVote === "upvote"
-              ? "text-orange-500 font-bold"
-              : "text-gray-400 hover:text-orange-500"
+              ? "text-orange-500 dark:text-orange-400 font-bold"
+              : "text-muted-foreground hover:text-orange-600 dark:hover:text-orange-400"
           }`}
         />
       </button>
 
-      <span className="text-sm font-medium text-gray-900">
+      <span className="text-sm font-medium text-foreground">
         {optimisticScore}
       </span>
 
@@ -127,14 +127,14 @@ function PostVoteButtons({
         disabled={!isSignedIn || isPending || !user}
         onClick={handleDownvote}
         className={`p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed ${
-          optimisticVote === "downvote" ? "bg-blue-100" : "hover:bg-gray-100"
+          optimisticVote === "downvote" ? "bg-blue-500/10" : "hover:bg-muted"
         } ${isPending ? "opacity-50 cursor-not-allowed" : ""}`}
       >
         <ArrowDown
           className={`w-5 h-5 ${
             optimisticVote === "downvote"
-              ? "text-blue-500 font-bold"
-              : "text-gray-400 hover:text-blue-500"
+              ? "text-blue-500 dark:text-blue-400 font-bold"
+              : "text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400"
           }`}
         />
       </button>

@@ -60,6 +60,36 @@ export const subredditType = defineType({
       initialValue: () => new Date().toISOString(),
       validation: (rule) => rule.required(),
     }),
+    defineField({
+      name: "rules",
+      title: "Community Rules",
+      type: "array",
+      description: "Rules that members must follow in this community",
+      of: [
+        {
+          type: "object",
+          fields: [
+            defineField({
+              name: "title",
+              title: "Rule Title",
+              type: "string",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "description",
+              title: "Rule Description",
+              type: "text",
+            }),
+          ],
+          preview: {
+            select: {
+              title: "title",
+              subtitle: "description",
+            },
+          },
+        },
+      ],
+    }),
   ],
   preview: {
     select: {

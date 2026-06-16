@@ -25,7 +25,7 @@ function CommentReply({
     <div>
       <div className="flex items-center gap-2">
         <button
-          className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-green-500 transition-colors mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-green-600 dark:hover:text-green-400 transition-colors mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={() => setIsReplying(!isReplying)}
           disabled={!isSignedIn}
         >
@@ -45,7 +45,7 @@ function CommentReply({
       </div>
 
       {isReplying && (
-        <div className="mt-3 ps-2 border-s-2 border-gray-100">
+        <div className="mt-3 ps-2 border-s-2 border-border">
           <CommentInput postId={postId} parentCommentId={comment._id} />
         </div>
       )}

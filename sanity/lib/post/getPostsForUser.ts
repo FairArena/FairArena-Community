@@ -14,7 +14,11 @@ export async function getPostsForUser(userId: string) {
       image,
       isDeleted,
       isReported,
-      flair
+      flair,
+      isNSFW,
+      isSpoiler,
+      postType,
+      linkUrl
     } | order(publishedAt desc)
   `);
 

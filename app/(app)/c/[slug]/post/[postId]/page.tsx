@@ -66,11 +66,11 @@ export default async function PostDetailPage({ params }: PostPageProps) {
   return (
     <>
       {/* Header */}
-      <section className="bg-white border-b">
+      <section className="bg-card border-b">
         <div className="mx-auto max-w-7xl px-4 py-3">
           <Link
             href={`/c/${slug}`}
-            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-orange-600 transition-colors font-medium"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-orange-600 transition-colors font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to c/{community.title}
@@ -85,13 +85,13 @@ export default async function PostDetailPage({ params }: PostPageProps) {
             {/* Left: Post + Comments */}
             <div className="flex-1 min-w-0">
               <Suspense
-                fallback={<div className="bg-white rounded-md border border-gray-200 h-64 animate-pulse" />}
+                fallback={<div className="bg-card rounded-md border border-border h-64 animate-pulse" />}
               >
                 <PostDetail post={post} userId={user?.id || null} />
               </Suspense>
 
               <Suspense
-                fallback={<div className="bg-white rounded-lg border border-gray-200 h-32 animate-pulse mt-6" />}
+                fallback={<div className="bg-card rounded-lg border border-border h-32 animate-pulse mt-6" />}
               >
                 <SimilarPosts
                   postId={post._id}
@@ -104,7 +104,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
             {/* Right: Community Sidebar */}
             <div className="hidden lg:block w-80 flex-shrink-0">
               <Suspense
-                fallback={<div className="bg-white rounded-lg border border-gray-200 h-64 animate-pulse" />}
+                fallback={<div className="bg-card rounded-lg border border-border h-64 animate-pulse" />}
               >
                 <CommunitySidebar
                   community={{

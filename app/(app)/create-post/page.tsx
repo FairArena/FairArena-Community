@@ -17,12 +17,12 @@ async function CreatePostPage({
     return (
       <>
         {/* Banner */}
-        <section className="bg-white border-b">
+        <section className="bg-card border-b">
           <div className="mx-auto max-w-7xl px-4 py-6">
             <div className="flex items-center">
               <div>
                 <h1 className="text-2xl font-bold">Create Post</h1>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Create a post in the{" "}
                   <span className="font-bold">{subreddit}</span> community
                 </p>
@@ -42,12 +42,12 @@ async function CreatePostPage({
   return (
     <>
       {/* Banner */}
-      <section className="bg-white border-b">
+      <section className="bg-card border-b">
         <div className="mx-auto max-w-7xl px-4 py-6">
           <div className="flex items-center">
             <div>
               <h1 className="text-2xl font-bold">Create Post</h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Select a community for your post
               </p>
             </div>
@@ -70,7 +70,7 @@ async function CreatePostPage({
 
               <hr className="my-4" />
 
-              <p className="mt-4 text-sm text-gray-600">
+              <p className="mt-4 text-sm text-muted-foreground">
                 If you don&apos;t see your community, you can create it here.
               </p>
               <div className="mt-2">

@@ -42,7 +42,7 @@ function ReportButton({ contentId, isReported: initialReported }: ReportButtonPr
     <button
       onClick={handleReport}
       disabled={isReported || isLoading || !isSignedIn}
-      className={`flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-red-500 transition-colors mt-1 disabled:opacity-50 disabled:cursor-not-allowed ${
+      className={`flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-red-600 dark:hover:text-red-400 transition-colors mt-1 disabled:opacity-50 disabled:cursor-not-allowed ${
         isReported ? "text-red-600 dark:text-red-400" : ""
       }`}
     >
